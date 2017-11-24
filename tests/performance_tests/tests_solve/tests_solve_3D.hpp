@@ -32,7 +32,7 @@ int Test_solve_HE_3D_P1_dir_hmat(Real kappa, Real radius, Real lc) {
   }
 
 	// Mesh
-	Geometry node_output("output.msh");
+	Geometry node_output("../data/output.msh");
 	int nb_dof_output = NbNode(node_output);
 	Mesh2D mesh_output; mesh_output.Load(node_output,0);
 	Orienting(mesh_output);
