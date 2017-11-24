@@ -1,5 +1,5 @@
-#ifndef BEMTOOLEXT_MISC_REFSOLUTION_HPP
-#define BEMTOOLEXT_MISC_REFSOLUTION_HPP
+#ifndef BEMTOOLTESTS_MISC_REFSOLUTION_HPP
+#define BEMTOOLTESTS_MISC_REFSOLUTION_HPP
 
 #include <bemtool/equations.hpp>
 #include <bemtool/operator/operator.hpp>

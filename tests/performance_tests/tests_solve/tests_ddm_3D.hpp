@@ -3,7 +3,7 @@
 
 #include <bemtool/tools.hpp>
 #include <bemtool/miscellaneous/htool_wrap.hpp>
-#include <bemtool-tests/miscellaneous/gmsh_calls.hpp>
+#include <bemtool-tests/tools.hpp>
 
 using namespace bemtool;
 

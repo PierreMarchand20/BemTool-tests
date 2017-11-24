@@ -4,8 +4,7 @@
 #include <bemtool/tools.hpp>
 #include <bemtool/miscellaneous/eigen_wrap.hpp>
 
-#include <bemtool-tests/miscellaneous/gmsh_calls.hpp>
-#include <bemtool-tests/miscellaneous/refsolution.hpp>
+#include <bemtool-tests/tools.hpp>
 
 using namespace bemtool;
 
