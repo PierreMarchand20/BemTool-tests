@@ -3,7 +3,7 @@
 # Once done this will define
 #
 # BEMTOOL_FOUND
-# BEMTOOL_INCLUDE_DIR
+# BEMTOOL_INCLUDE_DIRS
 #
 
 FIND_PATH(
@@ -20,3 +20,7 @@ find_package_handle_standard_args(BemTool DEFAULT_MSG
 BEMTOOL_INCLUDE_DIR)
 
 mark_as_advanced(BEMTOOL_INCLUDE_DIR)
+
+if (BEMTOOL_FOUND)
+    set(BEMTOOL_INCLUDE_DIRS ${BEMTOOL_INCLUDE_DIR} )
+endif()
