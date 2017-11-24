@@ -4,8 +4,7 @@
 #include <numeric>
 #include <bemtool/tools.hpp>
 #include <bemtool/miscellaneous/eigen_wrap.hpp>
-#include <bemtool-ext/miscellaneous/gmsh_calls.hpp>
-#include <bemtool-ext/miscellaneous/overlap.hpp>
+#include <bemtool-tests/miscellaneous/gmsh_calls.hpp>
 
 using namespace bemtool;
 
