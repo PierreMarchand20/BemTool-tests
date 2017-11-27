@@ -91,7 +91,6 @@ double Test_potential_2D_hmat(Real kappa, Real radius, Real lc, Real lc_output) 
     double r = sqrt(x[0]*x[0]+x[1]*x[1]+x[2]*x[2]);
     double theta = std::atan2 (x[1],x[0]);
     trace_dirichlet[i] = RefSolution<EquationType,Dimension>::Compute(r,theta,p,radius,kappa);
-    std::cout << trace_dirichlet[i] <<std::endl;
     trace_neumann[i] = RefSolution<EquationType,Dimension>::ComputeDerivative(r,theta,p,radius,kappa);
 
   }
@@ -128,7 +127,8 @@ double Test_potential_2D_hmat(Real kappa, Real radius, Real lc, Real lc_output) 
     // std::cout << sol_SL[i]+sol_DL[i]<<" "<<sol_ref[i]<<std::endl;
     norm += pow(abs(sol_ref[i]),2);
     error += pow(abs(sol_ref[i]-sol_SL[i]-sol_DL[i]),2);
-    sol_real[i]=std::real(sol_SL[i]+sol_DL[i])/(pi);
+    std::cout << sol_ref[i]<<" "<<sol_SL[i]+sol_DL[i] << std::endl;
+    sol_real[i]=std::real(sol_SL[i]+sol_DL[i]);
     sol_ref_real[i]=std::real(sol_ref[i]);
   }
 
@@ -136,9 +136,10 @@ double Test_potential_2D_hmat(Real kappa, Real radius, Real lc, Real lc_output) 
   error = sqrt(error)/norm;
 
   // Save
-  WritePointValGmsh(mesh_output,"test.msh",sol_real);
-  WritePointValGmsh(mesh_output,"ref.msh",sol_ref_real);
-
+  // if(rank==0){
+  //   WritePointValGmsh(mesh_output,"test.msh",sol_real);
+  //   WritePointValGmsh(mesh_output,"ref.msh",sol_ref_real);
+  // }
 
 
   // Error
