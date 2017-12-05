@@ -127,7 +127,6 @@ double Test_potential_2D_hmat(Real kappa, Real radius, Real lc, Real lc_output) 
     // std::cout << sol_SL[i]+sol_DL[i]<<" "<<sol_ref[i]<<std::endl;
     norm += pow(abs(sol_ref[i]),2);
     error += pow(abs(sol_ref[i]-sol_SL[i]-sol_DL[i]),2);
-    std::cout << sol_ref[i]<<" "<<sol_SL[i]+sol_DL[i] << std::endl;
     sol_real[i]=std::real(sol_SL[i]+sol_DL[i]);
     sol_ref_real[i]=std::real(sol_ref[i]);
   }
