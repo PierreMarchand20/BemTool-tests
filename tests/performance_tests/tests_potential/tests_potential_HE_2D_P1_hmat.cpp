@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
   double error = 100*Test_potential_2D_hmat<HE,2>(kappa, radius, lc, lc_output);
   htool::toc();
   test = test || error>1;
-  if (rank){
+  if (rank==0){
 		std::cout << "Relative error:\t"<<error<<" %"<<std::endl;
 	}
   // Finalize the MPI environment.
