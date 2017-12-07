@@ -1,3 +1,4 @@
 add_subdirectory(tests_potential)
 add_subdirectory(tests_operator)
 add_subdirectory(tests_solve)
+add_subdirectory(tests_solve_multi_rhs)
