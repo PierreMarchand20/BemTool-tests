@@ -1,5 +1,5 @@
 
-#include "tests_ddm_2D.hpp"
+#include "tests_ddm_multi_rhs_2D.hpp"
 
 using namespace bemtool;
 int main(int argc, char *argv[]) {
