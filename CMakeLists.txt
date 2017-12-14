@@ -40,8 +40,8 @@ find_package(Boost REQUIRED)
 find_package(Htool REQUIRED)
 
 # SUITESPARSE
-find_package(SuiteSparse)
-#find_package(MUMPS)
+#find_package(SuiteSparse)
+find_package(MUMPS)
 
 # HPDDM
 find_package(HPDDM)
@@ -53,6 +53,15 @@ message("-- MPI include files found in " "${MPI_INCLUDE_PATH}")
 
 # OPENMP
 find_package(OpenMP)
+if (OpenMP_FOUND)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+    message("-- OpenMP flags are " "${OpenMP_CXX_FLAGS}" )
+    message("-- OpenMP linker flags are " "${OpenMP_EXE_LINKER_FLAGS}" )
+else()
+    message("-- OpenMP not found")
+endif()
 
 # BLAS
 find_package(BLAS REQUIRED)
@@ -71,16 +80,13 @@ target_include_directories(bemtool INTERFACE
 					${Boost_INCLUDE_DIRS}
 					${HTOOL_INCLUDE_DIR}
 					${MPI_INCLUDE_PATH}
-					${HPDDM_INCLUDE_DIR}
-					${SUITESPARSE_INCLUDE_DIRS})
+					${HPDDM_INCLUDE_DIR})
+
 target_link_libraries(bemtool INTERFACE
 					${MPI_LIBRARIES}
 					${BLAS_LIBRARIES}
 					${LAPACK_LIBRARIES}
-					${SUITESPARSE_LIBRARIES}
-                    ${OpenMP_EXE_LINKER_FLAGS}
-                    ${OpenMP_CXX_FLAGS})
-
+					-ldmumps -lptesmumps -lptscotcherrexit -lptscotchparmetis -lscotch -lscotcherr -lptscotch -lptscotcherr -lscotchmetis -lzmumps -lmumps_common -lpord -lesmumps -lptesmumps -lptscotcherrexit -lptscotchparmetis -lscotch -lscotcherr -lptscotch -lptscotcherr -lscotchmetis /opt/software/occigen/libraries/parmetis/4.0.3-real64/intel/17.0/intelmpi/2017.0.098/lib/libmetis.so -lifcore /opt/software/common/intel/compilers_and_libraries_2017.0.098/linux/mkl/lib/intel64/libmkl_scalapack_ilp64.a -Wl,--start-group /opt/software/common/intel/compilers_and_libraries_2017.0.098/linux/mkl/lib/intel64/libmkl_intel_ilp64.a /opt/software/common/intel/compilers_and_libraries_2017.0.098/linux/mkl/lib/intel64/libmkl_intel_thread.a /opt/software/common/intel/compilers_and_libraries_2017.0.098/linux/mkl/lib/intel64/libmkl_core.a /opt/software/common/intel/compilers_and_libraries_2017.0.098/linux/mkl/lib/intel64/libmkl_blacs_intelmpi_ilp64.a)
 
 # For headers to show in IDE
 if (NOT "${CMAKE_VERSION}" VERSION_LESS 3.1)
