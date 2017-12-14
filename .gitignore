@@ -35,5 +35,8 @@
 build*
 bin*
 
+# Folders used for outputs
+output*
+
 # Temporary files
 *.DS_Store
