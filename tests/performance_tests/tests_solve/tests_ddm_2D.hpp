@@ -194,6 +194,7 @@ int Test_ddm_HE_2D_P1_indirect_dir_hmat(Real kappa, Real radius, Real lc) {
   int nb_elt = NbElt(mesh);
   MPI_Barrier(MPI_COMM_WORLD);
   if (rank==0){
+    WriteMeshParaview(mesh,"mesh_paraview.geo");
     gmsh_clean("circle");
   }
 
@@ -215,6 +216,7 @@ int Test_ddm_HE_2D_P1_indirect_dir_hmat(Real kappa, Real radius, Real lc) {
 		uinc_abs[i] = std::abs(uinc[i]);
 	}
 	if (rank==0){
+        // WriteMeshParaview(mesh_output,"mesh_output_paraview.geo");
     WritePointValGmsh(mesh_output,(outputpath+"uinc_real.msh").c_str(),uinc_real);
     WritePointValGmsh(mesh_output,(outputpath+"uinc_abs.msh").c_str(),uinc_abs);
   }
@@ -231,10 +233,12 @@ int Test_ddm_HE_2D_P1_indirect_dir_hmat(Real kappa, Real radius, Real lc) {
 
 	// Operator
   BIOp<HE_SL_2D_P1xP1> BIO_V(mesh,mesh,kappa);
+  SubBIOp<BIOp<HE_SL_2D_P1xP1>> subBIO_V(BIO_V,dof,dof);
 	Potential<PotKernel<HE,SL_POT,2,P1_1D>> POT_SL(mesh,kappa);
 
   // Generator
-  BIO_Generator<HE_SL_2D_P1xP1,P1_1D> generator_V(BIO_V,dof);
+  // BIO_Generator<HE_SL_2D_P1xP1,P1_1D> generator_V(BIO_V,dof);
+  SubBIO_Generator<HE_SL_2D_P1xP1,P1_1D> generator_V(subBIO_V,dof);
 	POT_Generator<PotKernel<HE,SL_POT,2,P1_1D>,P1_1D> generator_SL(POT_SL,dof,node_output);
 
 	// Cluster trees
@@ -244,7 +248,6 @@ int Test_ddm_HE_2D_P1_indirect_dir_hmat(Real kappa, Real radius, Real lc) {
   // HMatrix
   htool::HMatrix<htool::partialACA,Cplx> V(generator_V,t,x);
 	htool::HMatrix<htool::partialACA,Cplx> SL(generator_SL,t_output,x_output,t,x);
-
 	// Right-hand side
 	std::vector<Cplx> rhs(nb_dof,0);
   std::vector<double> rhs_real(nb_dof,0),rhs_abs(nb_dof,0);
@@ -315,6 +318,7 @@ int Test_ddm_HE_2D_P1_indirect_dir_hmat(Real kappa, Real radius, Real lc) {
 	ddm.save_infos((outputpath+"infos_V.txt").c_str(),std::ios_base::app);
 
   if (rank==0){
+      // WritePointValParaview(mesh_output,(outputpath+"rad_abs_paraview.msh").c_str(),rad_real);
 		WritePointValGmsh(mesh_output,(outputpath+"rad_phase.msh").c_str(),rad_phase);
     WritePointValGmsh(mesh_output,(outputpath+"rad_real.msh").c_str(),rad_real);
     WritePointValGmsh(mesh_output,(outputpath+"rad_abs.msh").c_str(),rad_abs);
