@@ -15,20 +15,31 @@ Real Test_operator_hmat(Real kappa, Real radius, Real lc) {
     // Get the rank of the process
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    std::string meshname;
+    if (dim==1){
+        meshname="circle";
+    }
+    else if (dim==2){
+        meshname="sphere";
+    }
 
     // Mesh
     if (rank==0){
-
-        gmsh_circle("circle",radius,lc);
+        if (dim==1){
+            gmsh_circle(meshname,radius,lc);
+        }
+        else if (dim==2){
+            gmsh_sphere(meshname,radius,lc);
+        }
     }
     MPI_Barrier(MPI_COMM_WORLD);
-    Geometry node("circle.msh");
+    Geometry node((meshname+".msh").c_str());
     Mesh<dim> mesh; mesh.Load(node,0);
     Orienting(mesh);
     int nb_elt = NbElt(mesh);
     MPI_Barrier(MPI_COMM_WORLD);
     if (rank==0){
-        gmsh_clean("circle");
+        gmsh_clean(meshname);
     }
 
     // Dof
@@ -53,16 +64,27 @@ Real Test_operator_hmat(Real kappa, Real radius, Real lc) {
 
     // Eigenvector
     std::vector<Cplx> En(nb_dof);
+    std::vector<double> En_real(nb_dof);
     for(int j=0; j<nb_elt; j++){
-        const N2&         jdof = dof[j];
-        const array<2,R3> xdof = dof(j);
+        const array<dim+1,int>&  jdof = dof[j];
+        const array<dim+1,R3> xdof = dof(j);
         for(int k=0; k<dim+1; k++){
-            En[jdof[k]] = exp(iu*n*std::atan2 (xdof[k][1],xdof[k][0]));
+            if (dim==1){
+                En[jdof[k]] = exp(iu*n*std::atan2 (xdof[k][1],xdof[k][0]));
+            }
+            else if (dim==2){
+                double rho = std::sqrt(xdof[k][0]*xdof[k][0]+xdof[k][1]*xdof[k][1]+xdof[k][2]*xdof[k][2]);
+                double theta = std::atan2(xdof[k][1],xdof[k][0]);
+                double phi = std::acos(xdof[k][2]/rho);
+                En[jdof[k]] = boost::math::spherical_harmonic(n,n,theta,phi);
+                En_real[jdof[k]] = std::real(boost::math::spherical_harmonic(n,n,theta,phi));
+            }
+
             // double r =sqrt(xdof[k][0]*xdof[k][0]+xdof[k][1]*xdof[k][1]+xdof[k][2]*xdof[k][2]);
             // En[jdof[k]] = pow( (xdof[k][0]+iu*xdof[k][1])/r, n);
         }
     }
-
+WritePointValGmsh(dof,"test.msh",En_real);
     // Eigenvalue
     std::vector<Cplx> temp = A*En;
     Cplx sum =0.;
