@@ -11,8 +11,8 @@ int main(int argc, char *argv[]) {
   // HTOOL variable
   htool::SetNdofPerElt(1);
   htool::SetEpsilon(1e-6);
-  htool::SetEta(1);
-  htool::SetMinClusterSize(10);
+  htool::SetEta(10);
+  htool::SetMinClusterSize(5);
 
   // Data
   Real kappa = 0.5;
@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
   // Test
   int test = 0;
   htool::tic();
-  Real error = 100*Test_operator_3D_hmat<YU_SL_3D_P1xP1>(kappa,radius,lc);
+  Real error = 100*Test_operator_hmat<2,LA_SL_3D_P1xP1,P1_2D>(kappa,radius,lc);
   htool::toc();
 	test = test || error>1;
 	if (rank==0){

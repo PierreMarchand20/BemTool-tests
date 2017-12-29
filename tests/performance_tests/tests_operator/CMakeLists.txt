@@ -25,8 +25,8 @@ foreach(equation ${equations})
     add_test(NAME Tests_${equation}_${operator}_2D_P1xP1_hmat COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 2 ${CMAKE_CURRENT_BINARY_DIR}/Tests_${equation}_${operator}_2D_P1xP1_hmat)
   endforeach()
 endforeach()
-# Tests with hmats
-# add_executable(Tests_HE_SL_3D_P1xP1_hmat tests_HE_SL_3D_P1xP1_hmat.cpp)
-# target_link_libraries(Tests_HE_SL_3D_P1xP1_hmat bemtool)
-# add_dependencies(build-performance-tests Tests_HE_SL_3D_P1xP1_hmat)
-# add_test(NAME Tests_HE_SL_3D_P1xP1_hmat COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 2 ${CMAKE_CURRENT_BINARY_DIR}/Tests_HE_SL_3D_P1xP1_hmat)
+
+add_executable(Tests_HE_SL_3D_P1xP1_hmat tests_HE_SL_3D_P1xP1_hmat.cpp)
+target_link_libraries(Tests_HE_SL_3D_P1xP1_hmat bemtool)
+add_dependencies(build-performance-tests Tests_HE_SL_3D_P1xP1_hmat)
+add_test(NAME Tests_HE_SL_3D_P1xP1_hmat COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 2 ${CMAKE_CURRENT_BINARY_DIR}/Tests_HE_SL_3D_P1xP1_hmat)

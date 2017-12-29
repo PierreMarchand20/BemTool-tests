@@ -16,13 +16,13 @@ int main(int argc, char *argv[]) {
 
   // Data
   Real kappa = 0.5;
-  Real radius = 1.;
-  Real lc = 0.0025;
+  Real radius = 0.5;
+  Real lc = 0.00075;
 
   // Test
   int test = 0;
   htool::tic();
-  Real error = 100*Test_operator_2D_hmat<YU_DL_2D_P1xP1>(kappa,radius,lc);
+  Real error = 100*Test_operator_hmat<1,YU_DL_2D_P1xP1,P1_1D>(kappa,radius,lc);
   htool::toc();
 	test = test || error>1;
   if (rank==0){
