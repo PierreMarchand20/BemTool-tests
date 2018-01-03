@@ -4,43 +4,51 @@
 #include <bemtool/tools.hpp>
 #include <bemtool/miscellaneous/htool_wrap.hpp>
 #include <bemtool-tests/tools.hpp>
+#include <stdio.h>  /* defines FILENAME_MAX */
+#include <unistd.h>
+#define GetCurrentDir getcwd
+#include<iostream>
 
+std::string GetCurrentWorkingDir( void ) {
+  char buff[FILENAME_MAX];
+  GetCurrentDir( buff, FILENAME_MAX );
+  std::string current_working_dir(buff);
+  return current_working_dir;
+}
 using namespace bemtool;
 
 template <int dim, typename OperatorType, typename Discretization>
 Real Test_operator_hmat(Real kappa, Real radius, Real lc) {
+    std::cout << GetCurrentWorkingDir() << std::endl;
     // Data
     Real kappa2 = kappa*kappa;
-    int n = 1;
+    int n;
+    if (dim==1){
+        n = 1;
+    }
+    else if (dim==2){
+        n =0;
+    }
+
     // Get the rank of the process
     int rank;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     std::string meshname;
     if (dim==1){
-        meshname="circle";
+        meshname="../../../../data/tests/functional_tests/tests_operator/circle_"+NbrToStr(lc);
     }
     else if (dim==2){
         meshname="sphere";
     }
 
     // Mesh
-    if (rank==0){
-        if (dim==1){
-            gmsh_circle(meshname,radius,lc);
-        }
-        else if (dim==2){
-            gmsh_sphere(meshname,radius,lc);
-        }
-    }
     MPI_Barrier(MPI_COMM_WORLD);
+    std::cout << (meshname+".msh").c_str() << std::endl;
     Geometry node((meshname+".msh").c_str());
     Mesh<dim> mesh; mesh.Load(node,0);
     Orienting(mesh);
     int nb_elt = NbElt(mesh);
     MPI_Barrier(MPI_COMM_WORLD);
-    if (rank==0){
-        gmsh_clean(meshname);
-    }
 
     // Dof
     Dof<Discretization> dof(mesh);
@@ -74,8 +82,8 @@ Real Test_operator_hmat(Real kappa, Real radius, Real lc) {
             }
             else if (dim==2){
                 double rho = std::sqrt(xdof[k][0]*xdof[k][0]+xdof[k][1]*xdof[k][1]+xdof[k][2]*xdof[k][2]);
-                double theta = std::atan2(xdof[k][1],xdof[k][0]);
-                double phi = std::acos(xdof[k][2]/rho);
+                double phi = std::atan2(xdof[k][1],xdof[k][0]);
+                double theta = std::acos(xdof[k][2]/rho);
                 En[jdof[k]] = boost::math::spherical_harmonic(n,n,theta,phi);
                 En_real[jdof[k]] = std::real(boost::math::spherical_harmonic(n,n,theta,phi));
             }

@@ -216,7 +216,7 @@ int Test_ddm_HE_2D_P1_indirect_dir_hmat(Real kappa, Real radius, Real lc) {
 		uinc_abs[i] = std::abs(uinc[i]);
 	}
 	if (rank==0){
-        // WriteMeshParaview(mesh_output,"mesh_output_paraview.geo");
+        WriteMeshParaview(mesh_output,"mesh_output_paraview.geo");
     WritePointValGmsh(mesh_output,(outputpath+"uinc_real.msh").c_str(),uinc_real);
     WritePointValGmsh(mesh_output,(outputpath+"uinc_abs.msh").c_str(),uinc_abs);
   }
@@ -313,12 +313,23 @@ int Test_ddm_HE_2D_P1_indirect_dir_hmat(Real kappa, Real radius, Real lc) {
 	// Save
 	V.print_infos();
   SL.print_infos();
+  ddm.print_infos();
   V.save_infos((outputpath+"infos_V.txt").c_str());
   SL.save_infos((outputpath+"infos_SL.txt").c_str());
 	ddm.save_infos((outputpath+"infos_V.txt").c_str(),std::ios_base::app);
 
   if (rank==0){
-      // WritePointValParaview(mesh_output,(outputpath+"rad_abs_paraview.msh").c_str(),rad_real);
+      int nb = 50;
+      for (int i=0;i<nb;i++){
+          std::vector<Real> output_real(nb_dof_output),output_abs(nb_dof_output);
+          for (int j=0;j<nb_dof_output;j++){
+              output_real[j]=std::real((sol_SL[j]+uinc[j])*exp(-pi*iu*i*(2./nb)));
+              output_abs[j]=std::abs((sol_SL[j]+uinc[j])*exp(-pi*iu*i*(2./nb)));
+
+          }
+          WritePointValParaview(mesh_output,("rad_real_paraview.scl"+NbrToStr(i)).c_str(),output_real);
+      }
+
 		WritePointValGmsh(mesh_output,(outputpath+"rad_phase.msh").c_str(),rad_phase);
     WritePointValGmsh(mesh_output,(outputpath+"rad_real.msh").c_str(),rad_real);
     WritePointValGmsh(mesh_output,(outputpath+"rad_abs.msh").c_str(),rad_abs);

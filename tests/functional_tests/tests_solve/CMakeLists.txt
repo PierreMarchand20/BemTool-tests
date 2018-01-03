@@ -37,3 +37,7 @@ foreach(equation ${equations})
     endforeach()
   endforeach()
 endforeach()
+
+
+add_executable(Test test.cpp)
+target_link_libraries(Test bemtool)
