@@ -38,7 +38,10 @@ Real Test_operator_hmat(Real kappa, Real radius, Real lc) {
         meshname="../../../../data/tests/functional_tests/tests_operator/circle_"+NbrToStr(lc);
     }
     else if (dim==2){
-        meshname="sphere";
+    //     if (rank==0){
+    //     gmsh_sphere("sphere",radius,lc);
+    // }
+        meshname="../../../../data/tests/functional_tests/tests_operator/sphere_"+NbrToStr(lc);
     }
 
     // Mesh

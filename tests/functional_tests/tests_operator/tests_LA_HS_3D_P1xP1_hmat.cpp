@@ -17,12 +17,12 @@ int main(int argc, char *argv[]) {
   // Data
   Real kappa = 0.5;
   Real radius = 0.5;
-  Real lc = 0.04;
+  Real lc = 0.01;
 
   // Test
   int test = 0;
   htool::tic();
-  Real error = 100*Test_operator_hmat<2,HE_SL_3D_P1xP1,P1_2D>(kappa,radius,lc);
+  Real error = 100*Test_operator_hmat<2,LA_HS_3D_P1xP1,P1_2D>(kappa,radius,lc);
   htool::toc();
 	test = test || error>5;
 	if (rank==0){

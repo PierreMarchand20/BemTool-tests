@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
   // Test
   int test = 0;
   htool::tic();
-  Real error = 100*Test_operator_hmat<2,HE_SL_3D_P1xP1,P1_2D>(kappa,radius,lc);
+  Real error = 100*Test_operator_hmat<2,HE_TDL_3D_P1xP1,P1_2D>(kappa,radius,lc);
   htool::toc();
 	test = test || error>5;
 	if (rank==0){
