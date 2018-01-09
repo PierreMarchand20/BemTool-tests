@@ -24,13 +24,18 @@ Real Test_operator_hmat(Real kappa, Real radius, Real lc) {
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     std::string meshname;
     if (dim==1){
-        meshname="../../../../data/tests/functional_tests/tests_operator/circle_"+NbrToStr(lc);
+        if (rank==0){
+            gmsh_circle("circle",radius,lc);
+        }
+        meshname = "circle";
+        // meshname="../../../../data/tests/functional_tests/tests_operator/circle_"+NbrToStr(lc);
     }
     else if (dim==2){
-    //     if (rank==0){
-    //     gmsh_sphere("sphere",radius,lc);
-    // }
-        meshname="../../../../data/tests/functional_tests/tests_operator/sphere_"+NbrToStr(lc);
+        if (rank==0){
+            gmsh_sphere("sphere",radius,lc);
+        }
+        meshname = "sphere";
+        // meshname="../../../../data/tests/functional_tests/tests_operator/sphere_"+NbrToStr(lc);
     }
 
     // Mesh
