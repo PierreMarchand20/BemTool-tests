@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
   // Data
   Real kappa = 0.5;
   Real radius = 0.5;
-  Real lc = 0.04;
+  Real lc = 0.05;
 
   // Test
   int test = 0;

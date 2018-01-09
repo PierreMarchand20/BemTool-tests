@@ -99,5 +99,5 @@ endif()
 #========================== Repertories ======================================#
 #=============================================================================#
 enable_testing()
-add_custom_target(build-performance-tests)
+add_custom_target(build-functional-tests)
 add_subdirectory(tests EXCLUDE_FROM_ALL)

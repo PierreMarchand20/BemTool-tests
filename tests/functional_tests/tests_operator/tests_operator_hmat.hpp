@@ -4,22 +4,11 @@
 #include <bemtool/tools.hpp>
 #include <bemtool/miscellaneous/htool_wrap.hpp>
 #include <bemtool-tests/tools.hpp>
-#include <stdio.h>  /* defines FILENAME_MAX */
-#include <unistd.h>
-#define GetCurrentDir getcwd
-#include<iostream>
 
-std::string GetCurrentWorkingDir( void ) {
-  char buff[FILENAME_MAX];
-  GetCurrentDir( buff, FILENAME_MAX );
-  std::string current_working_dir(buff);
-  return current_working_dir;
-}
 using namespace bemtool;
 
 template <int dim, typename OperatorType, typename Discretization>
 Real Test_operator_hmat(Real kappa, Real radius, Real lc) {
-    std::cout << GetCurrentWorkingDir() << std::endl;
     // Data
     Real kappa2 = kappa*kappa;
     int n;
