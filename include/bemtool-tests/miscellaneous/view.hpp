@@ -61,6 +61,7 @@ void attach_ui(htool::Scene& s) {
         std::cerr << "No active project" << std::endl;
         else{
             std::string str = nanogui::file_dialog({{"msh", "Mesh file"}}, false);
+            glfwFocusWindow(gv.glwindow);
             if (str!=""){
                 if (combobox_op->selectedIndex()==0 && combobox_eq->selectedIndex()==0){
                     double kappa = 1;
