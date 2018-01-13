@@ -57,11 +57,8 @@ Real Test_operator_hmat(Real kappa, Real radius, Real lc) {
         x[i][2]=dof(((dof.ToElt(i))[0])[0])[((dof.ToElt(i))[0])[1]][2];
     }
 
-    // Operator
-    BIOp<OperatorType> V(mesh,mesh,kappa);
-
     // Generator
-    BIO_Generator<OperatorType,Discretization> generator(V,dof);
+    SubBIO_Generator<OperatorType,Discretization> generator(dof,kappa);
 
     // HMatrix
     htool::HMatrix<htool::partialACA,Cplx> A(generator,x);
