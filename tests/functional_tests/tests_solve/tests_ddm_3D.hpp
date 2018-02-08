@@ -64,14 +64,12 @@ int Test_ddm_HE_3D_P1_direct_dir_hmat(Real kappa, Real radius, Real lc) {
   }
 
 	// Operator
-  BIOp<HE_SL_3D_P1xP1> BIO_V(mesh,mesh,kappa);
-	BIOp<HE_DL_3D_P1xP1> BIO_K(mesh,mesh,kappa);
 	Potential<PotKernel<HE,SL_POT,3,P1_2D>> POT_SL(mesh,kappa);
   Potential<PotKernel<HE,DL_POT,3,P1_2D>> POT_DL(mesh,kappa);
 
   // Generator
-  BIO_Generator<HE_SL_3D_P1xP1,P1_2D> generator_V(BIO_V,dof);
-	BIO_Generator<HE_DL_3D_P1xP1,P1_2D> generator_K(BIO_K,dof);
+  SubBIO_Generator<HE_SL_3D_P1xP1,P1_2D> generator_V(dof,kappa);
+	SubBIO_Generator<HE_DL_3D_P1xP1,P1_2D> generator_K(dof,kappa);
 	POT_Generator<PotKernel<HE,SL_POT,3,P1_2D>,P1_2D> generator_SL(POT_SL,dof,node_output);
   POT_Generator<PotKernel<HE,DL_POT,3,P1_2D>,P1_2D> generator_DL(POT_DL,dof,node_output);
 
@@ -241,11 +239,10 @@ int Test_ddm_HE_3D_P1_indirect_dir_hmat(Real kappa, Real radius, Real lc) {
   }
 
 	// Operator
-  BIOp<HE_SL_3D_P1xP1> BIO_V(mesh,mesh,kappa);
 	Potential<PotKernel<HE,SL_POT,3,P1_2D>> POT_SL(mesh,kappa);
 
   // Generator
-  BIO_Generator<HE_SL_3D_P1xP1,P1_2D> generator_V(BIO_V,dof);
+  BIO_Generator<HE_SL_3D_P1xP1,P1_2D> generator_V(dof,kappa);
 	POT_Generator<PotKernel<HE,SL_POT,3,P1_2D>,P1_2D> generator_SL(POT_SL,dof,node_output);
 
 	// Cluster trees

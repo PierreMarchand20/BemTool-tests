@@ -64,14 +64,12 @@ int Test_ddm_HE_2D_P1_direct_dir_hmat(Real kappa, Real radius, Real lc) {
   }
 
 	// Operator
-  BIOp<HE_SL_2D_P1xP1> BIO_V(mesh,mesh,kappa);
-	BIOp<HE_DL_2D_P1xP1> BIO_K(mesh,mesh,kappa);
 	Potential<PotKernel<HE,SL_POT,2,P1_1D>> POT_SL(mesh,kappa);
   Potential<PotKernel<HE,DL_POT,2,P1_1D>> POT_DL(mesh,kappa);
 
   // Generator
-  BIO_Generator<HE_SL_2D_P1xP1,P1_1D> generator_V(BIO_V,dof);
-	BIO_Generator<HE_DL_2D_P1xP1,P1_1D> generator_K(BIO_K,dof);
+  SubBIO_Generator<HE_SL_2D_P1xP1,P1_1D> generator_V(dof,kappa);
+	SubBIO_Generator<HE_DL_2D_P1xP1,P1_1D> generator_K(dof,kappa);
 	POT_Generator<PotKernel<HE,SL_POT,2,P1_1D>,P1_1D> generator_SL(POT_SL,dof,node_output);
   POT_Generator<PotKernel<HE,DL_POT,2,P1_1D>,P1_1D> generator_DL(POT_DL,dof,node_output);
 
@@ -217,9 +215,9 @@ int Test_ddm_HE_2D_P1_indirect_dir_hmat(Real kappa, Real radius, Real lc) {
 	}
 	if (rank==0){
         WriteMeshParaview(mesh_output,"mesh_output_paraview.geo");
-    WritePointValGmsh(mesh_output,(outputpath+"uinc_real.msh").c_str(),uinc_real);
-    WritePointValGmsh(mesh_output,(outputpath+"uinc_abs.msh").c_str(),uinc_abs);
-  }
+        WritePointValGmsh(mesh_output,(outputpath+"uinc_real.msh").c_str(),uinc_real);
+        WritePointValGmsh(mesh_output,(outputpath+"uinc_abs.msh").c_str(),uinc_abs);
+    }
 
   // Dof
   Dof<P1_1D> dof(mesh);
@@ -232,13 +230,10 @@ int Test_ddm_HE_2D_P1_indirect_dir_hmat(Real kappa, Real radius, Real lc) {
   }
 
 	// Operator
-  BIOp<HE_SL_2D_P1xP1> BIO_V(mesh,mesh,kappa);
-  SubBIOp<BIOp<HE_SL_2D_P1xP1>> subBIO_V(BIO_V,dof,dof);
 	Potential<PotKernel<HE,SL_POT,2,P1_1D>> POT_SL(mesh,kappa);
 
-  // Generator
-  // BIO_Generator<HE_SL_2D_P1xP1,P1_1D> generator_V(BIO_V,dof);
-  SubBIO_Generator<HE_SL_2D_P1xP1,P1_1D> generator_V(subBIO_V,dof);
+    // Generator
+    SubBIO_Generator<HE_SL_2D_P1xP1,P1_1D> generator_V(dof,kappa);
 	POT_Generator<PotKernel<HE,SL_POT,2,P1_1D>,P1_1D> generator_SL(POT_SL,dof,node_output);
 
 	// Cluster trees
@@ -320,17 +315,20 @@ int Test_ddm_HE_2D_P1_indirect_dir_hmat(Real kappa, Real radius, Real lc) {
 
   if (rank==0){
       int nb = 50;
+      std::vector<double> times(nb);
       for (int i=0;i<nb;i++){
           std::vector<Real> output_real(nb_dof_output),output_abs(nb_dof_output);
           for (int j=0;j<nb_dof_output;j++){
               output_real[j]=std::real((sol_SL[j]+uinc[j])*exp(-pi*iu*i*(2./nb)));
               output_abs[j]=std::abs((sol_SL[j]+uinc[j])*exp(-pi*iu*i*(2./nb)));
 
+
           }
+          times[i]=i;
           WritePointValParaview(mesh_output,("rad_real_paraview.scl"+NbrToStr(i)).c_str(),output_real);
       }
-
-		WritePointValGmsh(mesh_output,(outputpath+"rad_phase.msh").c_str(),rad_phase);
+    WriteCaseParaview("mesh_output_paraview.case","mesh_output_paraview.geo","rad_real","rad_real_paraview.scl",times);
+	WritePointValGmsh(mesh_output,(outputpath+"rad_phase.msh").c_str(),rad_phase);
     WritePointValGmsh(mesh_output,(outputpath+"rad_real.msh").c_str(),rad_real);
     WritePointValGmsh(mesh_output,(outputpath+"rad_abs.msh").c_str(),rad_abs);
   }
