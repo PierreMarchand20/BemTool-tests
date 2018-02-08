@@ -7,7 +7,7 @@
 
 using namespace bemtool;
 
-int Test_ddm_HE_3D_P1_direct_dir_hmat(Real kappa, Real radius, Real lc) {
+int Test_ddm_HE_3D_P1_direct_dir_hmat(Real kappa, Real radius, Real lc, int save=0) {
   // Get the rank of the process
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -48,7 +48,7 @@ int Test_ddm_HE_3D_P1_direct_dir_hmat(Real kappa, Real radius, Real lc) {
 		uinc_real[i] = std::real(uinc[i]);
 		uinc_abs[i] = std::abs(uinc[i]);
 	}
-	if (rank==0){
+	if (rank==0 && save>0){
     WritePointValGmsh(mesh_output,(outputpath+"uinc_real.msh").c_str(),uinc_real);
     WritePointValGmsh(mesh_output,(outputpath+"uinc_abs.msh").c_str(),uinc_abs);
   }
@@ -119,9 +119,9 @@ int Test_ddm_HE_3D_P1_direct_dir_hmat(Real kappa, Real radius, Real lc) {
 	for (int i =0;i<cluster_to_ovr_subdomain.size();i++){
 		part_overlap[ovr_subdomain_to_global[cluster_to_ovr_subdomain[i]]]+=1;
 	}
-
+if (save>0){
   WritePointValGmsh(dof,("part_ovlerap_"+NbrToStr(rank)+".msh").c_str(),part_overlap);
-
+}
 
 
 
@@ -143,7 +143,7 @@ int Test_ddm_HE_3D_P1_direct_dir_hmat(Real kappa, Real radius, Real lc) {
 
 
 	// Save
-  if (rank==0){
+  if (rank==0 && save>0){
     WritePointValGmsh(dof,(outputpath+"sol_abs.msh").c_str(),sol_abs);
     WritePointValGmsh(dof,(outputpath+"sol_real.msh").c_str(),sol_real);
     WritePointValGmsh(dof,(outputpath+"rhs_real.msh").c_str(),rhs_real);
@@ -173,7 +173,7 @@ int Test_ddm_HE_3D_P1_direct_dir_hmat(Real kappa, Real radius, Real lc) {
 	SL.save_infos((outputpath+"infos_SL.txt").c_str());
 	DL.save_infos((outputpath+"infos_DL.txt").c_str());
 	ddm.save_infos((outputpath+"infos_V.txt").c_str(),std::ios_base::app);
-  if (rank==0){
+  if (rank==0 && save>0){
 		WritePointValGmsh(mesh_output,(outputpath+"rad_real.msh").c_str(),rad_real);
 		WritePointValGmsh(mesh_output,(outputpath+"rad_abs.msh").c_str(),rad_abs);
   }
@@ -182,7 +182,7 @@ int Test_ddm_HE_3D_P1_direct_dir_hmat(Real kappa, Real radius, Real lc) {
 }
 
 
-int Test_ddm_HE_3D_P1_indirect_dir_hmat(Real kappa, Real radius, Real lc) {
+int Test_ddm_HE_3D_P1_indirect_dir_hmat(Real kappa, Real radius, Real lc, int save=0) {
   // Get the rank of the process
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -223,7 +223,7 @@ int Test_ddm_HE_3D_P1_indirect_dir_hmat(Real kappa, Real radius, Real lc) {
 		uinc_real[i] = std::real(uinc[i]);
 		uinc_abs[i] = std::abs(uinc[i]);
 	}
-	if (rank==0){
+	if (rank==0 && save>0){
     WritePointValGmsh(mesh_output,(outputpath+"uinc_real.msh").c_str(),uinc_real);
     WritePointValGmsh(mesh_output,(outputpath+"uinc_abs.msh").c_str(),uinc_abs);
   }
@@ -286,9 +286,9 @@ int Test_ddm_HE_3D_P1_indirect_dir_hmat(Real kappa, Real radius, Real lc) {
 	for (int i =0;i<cluster_to_ovr_subdomain.size();i++){
 		part_overlap[ovr_subdomain_to_global[cluster_to_ovr_subdomain[i]]]+=1;
 	}
-
+if (save>0){
   WritePointValGmsh(dof,("part_ovlerap_"+NbrToStr(rank)+".msh").c_str(),part_overlap);
-
+}
 
 
 
@@ -323,7 +323,7 @@ int Test_ddm_HE_3D_P1_indirect_dir_hmat(Real kappa, Real radius, Real lc) {
   SL.save_infos((outputpath+"infos_SL.txt").c_str());
 	ddm.save_infos((outputpath+"infos_V.txt").c_str(),std::ios_base::app);
 
-  if (rank==0){
+  if (rank==0 && save>0){
 		WritePointValGmsh(mesh_output,(outputpath+"rad_phase.msh").c_str(),rad_phase);
     WritePointValGmsh(mesh_output,(outputpath+"rad_real.msh").c_str(),rad_real);
     WritePointValGmsh(mesh_output,(outputpath+"rad_abs.msh").c_str(),rad_abs);
