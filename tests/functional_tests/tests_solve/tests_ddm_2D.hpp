@@ -87,9 +87,9 @@ int Test_ddm_HE_2D_P1_direct_dir_hmat(Real kappa, Real radius, Real lc) {
   std::vector<Cplx> temp(nb_dof,0),gd(nb_dof,0),rhs(nb_dof,0);
   std::vector<double> rhs_real(nb_dof,0),rhs_abs(nb_dof,0),gd_real(nb_dof,0),gd_abs(nb_dof,0);
   for (int i=0;i<nb_elt;i++){
-    const N3&         jdof = dof[i];
-    const array<3,R3> xdof = dof(i);
-    R3x3 M_local = MassP1(mesh[i]);
+    const N2&         jdof = dof[i];
+    const array<2,R3> xdof = dof(i);
+    R2x2 M_local = MassP1(mesh[i]);
     C2 Uinc;
     Uinc[0]= exp( iu*kappa*(xdof[0],dir) );
     Uinc[1]= exp( iu*kappa*(xdof[1],dir) );
@@ -247,10 +247,10 @@ int Test_ddm_HE_2D_P1_indirect_dir_hmat(Real kappa, Real radius, Real lc) {
 	std::vector<Cplx> rhs(nb_dof,0);
   std::vector<double> rhs_real(nb_dof,0),rhs_abs(nb_dof,0);
   for (int i=0;i<nb_elt;i++){
-    const N3&         jdof = dof[i];
-    const array<3,R3> xdof = dof(i);
-    R3x3 M_local = MassP1(mesh[i]);
-    C3 Uinc;
+    const N2&         jdof = dof[i];
+    const array<2,R3> xdof = dof(i);
+    R2x2 M_local = MassP1(mesh[i]);
+    C2 Uinc;
     Uinc[0]= exp( iu*kappa*(xdof[0],dir) );
     Uinc[1]= exp( iu*kappa*(xdof[1],dir) );
 
