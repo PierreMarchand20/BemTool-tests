@@ -31,8 +31,8 @@ foreach(equation ${equations})
 # add_executable(Tests_solve_${equation}_3D_P1_dir_hmat tests_solve_${equation}_3D_P1_dir_hmat.cpp)
 # target_link_libraries(Tests_solve_${equation}_3D_P1_dir_hmat bemtool)
 
-      add_executable(Tests_ddm_${equation}_${dimension}_P1_${formulation}_dir_hmat tests_ddm_${equation}_${dimension}_P1_${formulation}_dir_hmat.cpp)
-      target_link_libraries(Tests_ddm_${equation}_${dimension}_P1_${formulation}_dir_hmat bemtool)
+      add_executable(Tests_ddm_${equation}_${dimension}_P1_${formulation}_hmat tests_ddm_${equation}_${dimension}_P1_${formulation}_hmat.cpp)
+      target_link_libraries(Tests_ddm_${equation}_${dimension}_P1_${formulation}_hmat bemtool)
 
     endforeach()
   endforeach()
