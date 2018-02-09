@@ -46,10 +46,10 @@ int main(int argc, char *argv[]) {
 
     // Mesh
     Geometry node(meshname);
-    Mesh2D mesh; mesh.Load(node,1);
+    Mesh2D mesh; mesh.Load(node,0);
     Orienting(mesh);
+    mesh = unbounded;
     int nb_elt = NbElt(mesh);
-    MPI_Barrier(MPI_COMM_WORLD);
 
 
     // Mesh
@@ -69,18 +69,15 @@ int main(int argc, char *argv[]) {
       uinc_real[i] = std::real(uinc[i]);
       uinc_abs[i] = std::abs(uinc[i]);
     }
-    if (rank==0 && save>0){
-      WriteMeshParaview(mesh_output,(outputpath+"output_paraview_mesh.geo").c_str());
-    }
 
     // Dof
     Dof<P1_2D> dof(mesh);
     int nb_dof = NbDof(dof);
     std::vector<htool::R3> x(nb_dof);
     for (int i=0;i<nb_dof;i++){
-      x[i][0]=dof(((dof.ToElt(i))[0])[0])[((dof.ToElt(i))[0])[1]][0];
-      x[i][1]=dof(((dof.ToElt(i))[0])[0])[((dof.ToElt(i))[0])[1]][1];
-      x[i][2]=dof(((dof.ToElt(i))[0])[0])[((dof.ToElt(i))[0])[1]][2];
+        x[i][0]=dof(((dof.ToElt(i))[0])[0])[((dof.ToElt(i))[0])[1]][0];
+        x[i][1]=dof(((dof.ToElt(i))[0])[0])[((dof.ToElt(i))[0])[1]][1];
+        x[i][2]=dof(((dof.ToElt(i))[0])[0])[((dof.ToElt(i))[0])[1]][2];
     }
 
     // Operator
@@ -124,32 +121,24 @@ int main(int argc, char *argv[]) {
     Partition(V.get_MasterOffset_t(), V.get_permt(),dof,cluster_to_ovr_subdomain,ovr_subdomain_to_global,neighbors,intersections);
 
     // Visu overlap
-    std::vector<double> part_overlap(nb_dof,0);
-    for (int i=0;i<ovr_subdomain_to_global.size();i++){
-        part_overlap[ovr_subdomain_to_global[i]]=1;
+    if (rank==0 && save>0){
+        std::vector<double> part_overlap(nb_dof,0);
+        for (int i=0;i<ovr_subdomain_to_global.size();i++){
+            part_overlap[ovr_subdomain_to_global[i]]=1;
+        }
+        for (int i =0;i<cluster_to_ovr_subdomain.size();i++){
+            part_overlap[ovr_subdomain_to_global[cluster_to_ovr_subdomain[i]]]+=1;
+        }
+        if (rank==0 && save>0){
+            WritePointValGmsh(dof,("part_ovlerap_"+NbrToStr(rank)+".msh").c_str(),part_overlap);
+        }
     }
-    for (int i =0;i<cluster_to_ovr_subdomain.size();i++){
-        part_overlap[ovr_subdomain_to_global[cluster_to_ovr_subdomain[i]]]+=1;
-    }
-    if (save>0){
-        WritePointValGmsh(dof,("part_ovlerap_"+NbrToStr(rank)+".msh").c_str(),part_overlap);
-    }
-
 
 
     // Solve
     std::vector<Cplx> sol(nb_dof,0);
-    std::vector<double> sol_abs(nb_dof),sol_real(nb_dof);
     htool::DDM<htool::partialACA,Cplx> ddm(generator_V,V,ovr_subdomain_to_global,cluster_to_ovr_subdomain,neighbors,intersections);
-
     ddm.solve(rhs.data(),sol.data());
-
-    for (int i=0;i<nb_dof;i++){
-        sol_abs[i]=std::abs(sol[i]);
-        sol_real[i]=std::real(sol[i]);
-        rhs_abs[i]=std::abs(rhs[i]);
-        rhs_real[i]=std::real(rhs[i]);
-    }
 
     // Radiated field
     std::vector<Cplx> sol_SL=SL*sol;
@@ -173,4 +162,10 @@ int main(int argc, char *argv[]) {
         WritePointValGmsh(mesh_output,(outputpath+"rad_real.msh").c_str(),rad_real);
         WritePointValGmsh(mesh_output,(outputpath+"rad_abs.msh").c_str(),rad_abs);
     }
+
+
+
+    // Finalize the MPI environment.
+    MPI_Finalize();
+    return 0;
 }

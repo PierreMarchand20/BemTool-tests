@@ -4,6 +4,8 @@
 #include <bemtool-tests/tools.hpp>
 
 using namespace bemtool;
+
+
 int main(int argc, char *argv[]) {
     // Initialize the MPI environment
     MPI_Init(&argc,&argv);
@@ -47,8 +49,9 @@ int main(int argc, char *argv[]) {
 
     // Mesh
     Geometry node(meshname);
-    Mesh1D mesh; mesh.Load(node,1);
+    Mesh1D mesh; mesh.Load(node,0);
     Orienting(mesh);
+    mesh = unbounded;
     int nb_elt = NbElt(mesh);
     MPI_Barrier(MPI_COMM_WORLD);
 
@@ -60,16 +63,18 @@ int main(int argc, char *argv[]) {
     std::vector<Cplx> uinc(nb_dof_output);
     std::vector<double> uinc_real(nb_dof_output),uinc_abs(nb_dof_output);
     for (int i=0;i<nb_dof_output;i++){
-      x_output[i][0]=node_output[i][0];
-      x_output[i][1]=node_output[i][1];
-      x_output[i][2]=node_output[i][2];
-      double temp = dir[0]*x_output[i][0]+dir[1]*x_output[i][1]+dir[2]*x_output[i][2];
-      uinc[i] = exp(iu*kappa*temp);
-      uinc_real[i] = std::real(uinc[i]);
-      uinc_abs[i] = std::abs(uinc[i]);
+        x_output[i][0]=node_output[i][0];
+        x_output[i][1]=node_output[i][1];
+        x_output[i][2]=node_output[i][2];
+        double temp = dir[0]*x_output[i][0]+dir[1]*x_output[i][1]+dir[2]*x_output[i][2];
+        uinc[i] = exp(iu*kappa*temp);
+        uinc_real[i] = std::real(uinc[i]);
+        uinc_abs[i] = std::abs(uinc[i]);
     }
     if (rank==0 && save>0){
-      WriteMeshParaview(mesh_output,(outputpath+"output_paraview_mesh.geo").c_str());
+        WriteMeshParaview(mesh_output,(outputpath+"output_paraview_mesh.geo").c_str());
+        WritePointValGmsh(mesh_output,(outputpath+"uinc_real.msh").c_str(),uinc_real);
+        WritePointValGmsh(mesh_output,(outputpath+"uinc_abs.msh").c_str(),uinc_abs);
     }
 
     // Dof
@@ -121,7 +126,7 @@ int main(int argc, char *argv[]) {
     Partition(V.get_MasterOffset_t(), V.get_permt(),dof,cluster_to_ovr_subdomain,ovr_subdomain_to_global,neighbors,intersections);
 
     // Visu overlap
-    if (save>0){
+    if (rank == 0 && save>0){
         std::vector<double> part_overlap(nb_dof,0);
       	for (int i=0;i<ovr_subdomain_to_global.size();i++){
       		part_overlap[ovr_subdomain_to_global[i]]=1;
@@ -136,15 +141,8 @@ int main(int argc, char *argv[]) {
     std::vector<Cplx> sol(nb_dof,0);
     std::vector<double> sol_abs(nb_dof),sol_real(nb_dof);
     htool::DDM<htool::partialACA,Cplx> ddm(generator_V,V,ovr_subdomain_to_global,cluster_to_ovr_subdomain,neighbors,intersections);
-
     ddm.solve(rhs.data(),sol.data());
 
-    for (int i=0;i<nb_dof;i++){
-        sol_abs[i]=std::abs(sol[i]);
-        sol_real[i]=std::real(sol[i]);
-        rhs_abs[i]=std::abs(rhs[i]);
-        rhs_real[i]=std::real(rhs[i]);
-    }
 
     // Radiated field
     std::vector<Cplx> sol_SL=SL*sol;
@@ -191,8 +189,8 @@ int main(int argc, char *argv[]) {
         }
         WriteCaseParaview("mesh_output_paraview.case","mesh_output_paraview.geo","rad_real","rad_real_paraview.scl",times);
         WritePointValGmsh(mesh_output,(outputpath+"rad_phase.msh").c_str(),rad_phase);
-          WritePointValGmsh(mesh_output,(outputpath+"rad_real.msh").c_str(),rad_real);
-          WritePointValGmsh(mesh_output,(outputpath+"rad_abs.msh").c_str(),rad_abs);
+        WritePointValGmsh(mesh_output,(outputpath+"rad_real.msh").c_str(),rad_real);
+        WritePointValGmsh(mesh_output,(outputpath+"rad_abs.msh").c_str(),rad_abs);
       }
 
     }

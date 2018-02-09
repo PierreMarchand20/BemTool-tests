@@ -47,10 +47,10 @@ int main(int argc, char *argv[]) {
 
     // Mesh
     Geometry node(meshname);
-    Mesh2D mesh; mesh.Load(node,1);
+    Mesh2D mesh; mesh.Load(node,0);
     Orienting(mesh);
+    mesh = unbounded;
     int nb_elt = NbElt(mesh);
-    MPI_Barrier(MPI_COMM_WORLD);
 
     // Mesh
     Geometry node_output(meshname_output);
@@ -68,9 +68,6 @@ int main(int argc, char *argv[]) {
       uinc[i] = exp(iu*kappa*temp);
       uinc_real[i] = std::real(uinc[i]);
       uinc_abs[i] = std::abs(uinc[i]);
-    }
-    if (rank==0 && save>0){
-      WriteMeshParaview(mesh_output,(outputpath+"output_paraview_mesh.geo").c_str());
     }
 
     // Dof
@@ -132,14 +129,14 @@ int main(int argc, char *argv[]) {
     Partition(V.get_MasterOffset_t(), V.get_permt(),dof,cluster_to_ovr_subdomain,ovr_subdomain_to_global,neighbors,intersections);
 
     // Visu overlap
-    std::vector<double> part_overlap(nb_dof,0);
-    for (int i=0;i<ovr_subdomain_to_global.size();i++){
-        part_overlap[ovr_subdomain_to_global[i]]=1;
-    }
-    for (int i =0;i<cluster_to_ovr_subdomain.size();i++){
-        part_overlap[ovr_subdomain_to_global[cluster_to_ovr_subdomain[i]]]+=1;
-    }
-    if (save>0){
+    if (rank == 0 && save>0){
+        std::vector<double> part_overlap(nb_dof,0);
+        for (int i=0;i<ovr_subdomain_to_global.size();i++){
+            part_overlap[ovr_subdomain_to_global[i]]=1;
+        }
+        for (int i =0;i<cluster_to_ovr_subdomain.size();i++){
+            part_overlap[ovr_subdomain_to_global[cluster_to_ovr_subdomain[i]]]+=1;
+        }
         WritePointValGmsh(dof,("part_ovlerap_"+NbrToStr(rank)+".msh").c_str(),part_overlap);
     }
 
