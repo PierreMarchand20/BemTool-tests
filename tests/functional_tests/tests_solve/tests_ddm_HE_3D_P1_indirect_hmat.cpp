@@ -121,7 +121,7 @@ int main(int argc, char *argv[]) {
     Partition(V.get_MasterOffset_t(), V.get_permt(),dof,cluster_to_ovr_subdomain,ovr_subdomain_to_global,neighbors,intersections);
 
     // Visu overlap
-    if (rank==0 && save>0){
+    if (save>0){
         std::vector<double> part_overlap(nb_dof,0);
         for (int i=0;i<ovr_subdomain_to_global.size();i++){
             part_overlap[ovr_subdomain_to_global[i]]=1;
