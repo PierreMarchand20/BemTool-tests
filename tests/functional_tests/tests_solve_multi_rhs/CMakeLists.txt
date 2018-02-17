@@ -6,7 +6,7 @@ set(equations "HE")
 # list(APPEND equations "YU")
 
 set(dimensions "2D")
-# list(APPEND dimensions "3D")
+list(APPEND dimensions "3D")
 
 set(formulations "indirect")
 # list(APPEND formulations "indirect")

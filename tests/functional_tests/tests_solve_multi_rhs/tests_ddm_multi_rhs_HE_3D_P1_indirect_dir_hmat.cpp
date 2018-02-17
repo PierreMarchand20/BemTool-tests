@@ -23,7 +23,9 @@ int main(int argc, char *argv[]) {
     }
 
     // Data
-    R3 dir; dir[0]=1;dir[1]=0;dir[2]=0;
+    int mu = 10;
+    int select = mu-1;
+    R3 dir_selected; dir_selected[0]=cos((2.*pi*select)/mu);dir_selected[1]=sin((2.*pi*select)/mu);dir_selected[2]=0;
     std::string meshname = argv[1];
     std::string meshname_output = argv[2];
     std::string outputpath = argv[3];
@@ -32,10 +34,9 @@ int main(int argc, char *argv[]) {
     double c0= 299792548;
     double kappa = 2*pi*frequency/c0;
 
-
     // HTOOL variable
     htool::SetNdofPerElt(1);
-    htool::SetEpsilon(1e-3);
+    htool::SetEpsilon(1e-6);
     htool::SetEta(1);
     htool::SetMinClusterSize(10);
 
@@ -43,7 +44,7 @@ int main(int argc, char *argv[]) {
     HPDDM::Option& opt = *HPDDM::Option::get();
     opt.parse(argc, argv, rank == 0);
     if(rank != 0)
-    	opt.remove("verbosity");
+        opt.remove("verbosity");
 
     // Mesh
     Geometry node(meshname);
@@ -56,18 +57,21 @@ int main(int argc, char *argv[]) {
     Geometry node_output(meshname_output);
     int nb_dof_output = NbNode(node_output);
     Mesh2D mesh_output; mesh_output.Load(node_output,0);
-    // Orienting(mesh_output);
     std::vector<htool::R3> x_output(nb_dof_output);
     std::vector<Cplx> uinc(nb_dof_output);
     std::vector<double> uinc_real(nb_dof_output),uinc_abs(nb_dof_output);
     for (int i=0;i<nb_dof_output;i++){
-      x_output[i][0]=node_output[i][0];
-      x_output[i][1]=node_output[i][1];
-      x_output[i][2]=node_output[i][2];
-      double temp = dir[0]*x_output[i][0]+dir[1]*x_output[i][1]+dir[2]*x_output[i][2];
-      uinc[i] = exp(iu*kappa*temp);
-      uinc_real[i] = std::real(uinc[i]);
-      uinc_abs[i] = std::abs(uinc[i]);
+        x_output[i][0]=node_output[i][0];
+        x_output[i][1]=node_output[i][1];
+        x_output[i][2]=node_output[i][2];
+        double temp = dir_selected[0]*x_output[i][0]+dir_selected[1]*x_output[i][1]+dir_selected[2]*x_output[i][2];
+        uinc[i] = exp(iu*kappa*temp);
+        uinc_real[i] = std::real(uinc[i]);
+        uinc_abs[i] = std::abs(uinc[i]);
+    }
+    if (rank==0 && save>0){
+        WritePointValGmsh(mesh_output,(outputpath+"uinc_real.msh").c_str(),uinc_real);
+        WritePointValGmsh(mesh_output,(outputpath+"uinc_abs.msh").c_str(),uinc_abs);
     }
 
     // Dof
@@ -75,20 +79,18 @@ int main(int argc, char *argv[]) {
     int nb_dof = NbDof(dof);
     std::vector<htool::R3> x(nb_dof);
     for (int i=0;i<nb_dof;i++){
-      x[i][0]=dof(((dof.ToElt(i))[0])[0])[((dof.ToElt(i))[0])[1]][0];
-      x[i][1]=dof(((dof.ToElt(i))[0])[0])[((dof.ToElt(i))[0])[1]][1];
-      x[i][2]=dof(((dof.ToElt(i))[0])[0])[((dof.ToElt(i))[0])[1]][2];
+        x[i][0]=dof(((dof.ToElt(i))[0])[0])[((dof.ToElt(i))[0])[1]][0];
+        x[i][1]=dof(((dof.ToElt(i))[0])[0])[((dof.ToElt(i))[0])[1]][1];
+        x[i][2]=dof(((dof.ToElt(i))[0])[0])[((dof.ToElt(i))[0])[1]][2];
     }
+
 
     // Operator
     Potential<PotKernel<HE,SL_POT,3,P1_2D>> POT_SL(mesh,kappa);
-    Potential<PotKernel<HE,DL_POT,3,P1_2D>> POT_DL(mesh,kappa);
 
     // Generator
     SubBIO_Generator<HE_SL_3D_P1xP1,P1_2D> generator_V(dof,kappa);
-    SubBIO_Generator<HE_DL_3D_P1xP1,P1_2D> generator_K(dof,kappa);
     POT_Generator<PotKernel<HE,SL_POT,3,P1_2D>,P1_2D> generator_SL(POT_SL,dof,node_output);
-    POT_Generator<PotKernel<HE,DL_POT,3,P1_2D>,P1_2D> generator_DL(POT_DL,dof,node_output);
 
     // Cluster trees
     std::shared_ptr<htool::Cluster_tree> t_output=std::make_shared<htool::Cluster_tree>(x_output);
@@ -96,29 +98,26 @@ int main(int argc, char *argv[]) {
 
     // HMatrix
     htool::HMatrix<htool::partialACA,Cplx> V(generator_V,t,x);
-    htool::HMatrix<htool::partialACA,Cplx> K(generator_K,t,x);
     htool::HMatrix<htool::partialACA,Cplx> SL(generator_SL,t_output,x_output,t,x);
-    htool::HMatrix<htool::partialACA,Cplx> DL(generator_DL,t_output,x_output,t,x);
 
     // Right-hand side
-    std::vector<Cplx> temp(nb_dof,0),gd(nb_dof,0),rhs(nb_dof,0);
-    std::vector<double> rhs_real(nb_dof,0),rhs_abs(nb_dof,0),gd_real(nb_dof,0),gd_abs(nb_dof,0);
-    for (int i=0;i<nb_elt;i++){
-        const N3&         jdof = dof[i];
-        const array<3,R3> xdof = dof(i);
-        R3x3 M_local = MassP1(mesh[i]);
-        C3 Uinc;
-        Uinc[0]= exp( iu*kappa*(xdof[0],dir) );
-        Uinc[1]= exp( iu*kappa*(xdof[1],dir) );
-        Uinc[2]= exp( iu*kappa*(xdof[2],dir) );
+    std::vector<Cplx> rhs(nb_dof*mu,0);
+    for (int j =0;j<mu;j++){
+        R3 dir; dir[0]=cos((2.*pi*j)/mu);dir[1]=sin((2.*pi*j)/mu);dir[2]=0;
+        for (int i=0;i<nb_elt;i++){
+            const N3&         jdof = dof[i];
+            const array<3,R3> xdof = dof(i);
+            R3x3 M_local = MassP1(mesh[i]);
+            C3 Uinc;
+            Uinc[0]= exp( iu*kappa*(xdof[0],dir) );
+            Uinc[1]= exp( iu*kappa*(xdof[1],dir) );
+            Uinc[2]= exp( iu*kappa*(xdof[2],dir) );
 
-        for(int k=0;k<3;k++){
-            gd[jdof[k]] -= (M_local(k,0)*Uinc[0]+M_local(k,1)*Uinc[1]+M_local(k,2)*Uinc[2]);
-            temp[jdof[k]]= Uinc[k];
+            for(int k=0;k<3;k++){
+                rhs[jdof[k]+j*nb_dof] -= (M_local(k,0)*Uinc[0]+M_local(k,1)*Uinc[1]+M_local(k,2)*Uinc[2]);
+            }
         }
     }
-    rhs=K*temp;
-    std::transform (rhs.begin(), rhs.end(), gd.begin(), rhs.begin(), [](Cplx u,Cplx v){return u+0.5*v;});
 
     // Overlap
     std::vector<int> cluster_to_ovr_subdomain;
@@ -131,72 +130,45 @@ int main(int argc, char *argv[]) {
     // Visu overlap
     if (save>0){
         std::vector<double> part_overlap(nb_dof,0);
-        for (int i=0;i<ovr_subdomain_to_global.size();i++){
-            part_overlap[ovr_subdomain_to_global[i]]=1;
-        }
-        for (int i =0;i<cluster_to_ovr_subdomain.size();i++){
-            part_overlap[ovr_subdomain_to_global[cluster_to_ovr_subdomain[i]]]+=1;
-        }
+      	for (int i=0;i<ovr_subdomain_to_global.size();i++){
+      		part_overlap[ovr_subdomain_to_global[i]]=1;
+      	}
+      	for (int i =0;i<cluster_to_ovr_subdomain.size();i++){
+      		part_overlap[ovr_subdomain_to_global[cluster_to_ovr_subdomain[i]]]+=1;
+      	}
         WritePointValGmsh(dof,("part_ovlerap_"+NbrToStr(rank)+".msh").c_str(),part_overlap);
     }
 
-
-
     // Solve
-    std::vector<Cplx> sol(nb_dof,0);
-    std::vector<double> sol_abs(nb_dof),sol_real(nb_dof);
+    std::vector<Cplx> sol(nb_dof*mu,0);
+    std::vector<double> sol_abs(nb_dof*mu),sol_real(nb_dof*mu);
     htool::DDM<htool::partialACA,Cplx> ddm(generator_V,V,ovr_subdomain_to_global,cluster_to_ovr_subdomain,neighbors,intersections);
-
-    ddm.solve(rhs.data(),sol.data());
-
-    for (int i=0;i<nb_dof;i++){
-        sol_abs[i]=std::abs(sol[i]);
-        sol_real[i]=std::real(sol[i]);
-        rhs_abs[i]=std::abs(rhs[i]);
-        rhs_real[i]=std::real(rhs[i]);
-        gd_abs[i]=std::abs(gd[i]);
-        gd_real[i]=std::real(gd[i]);
-    }
-
-
-    // Save
-    if (rank==0 && save>0){
-        WritePointValGmsh(dof,(outputpath+"sol_abs.msh").c_str(),sol_abs);
-        WritePointValGmsh(dof,(outputpath+"sol_real.msh").c_str(),sol_real);
-        WritePointValGmsh(dof,(outputpath+"rhs_real.msh").c_str(),rhs_real);
-        WritePointValGmsh(dof,(outputpath+"rhs_abs.msh").c_str(),rhs_abs);
-
-        WritePointValGmsh(dof,(outputpath+"gd_real.msh").c_str(),gd_real);
-        WritePointValGmsh(dof,(outputpath+"gd_abs.msh").c_str(),gd_abs);
-    }
+    ddm.solve(rhs.data(),sol.data(),mu);
 
     // Radiated field
-    std::vector<Cplx> sol_SL=SL*sol;
-    std::vector<Cplx> sol_DL=DL*temp;
-    std::vector<double> rad_real(nb_dof_output,0),rad_abs(nb_dof_output,0);
+    std::vector<Cplx> sol_SL(nb_dof_output*mu);
+    SL.mvprod_global(sol.data(),sol_SL.data(),mu);
+    std::vector<double> rad_real(nb_dof_output,0),rad_phase(nb_dof_output,0),rad_abs(nb_dof_output,0);
 
     for (int i =0;i<nb_dof_output;i++){
-        rad_real[i]=std::real(sol_SL[i]-sol_DL[i]+uinc[i]);
-        rad_abs[i]=std::abs(sol_SL[i]-sol_DL[i]+uinc[i]);
+        rad_phase[i]=atan2(std::imag(sol_SL[i+select*nb_dof_output]+uinc[i]),std::real(sol_SL[i+select*nb_dof_output]+uinc[i]));
+        rad_real[i]=std::real(sol_SL[i+select*nb_dof_output]+uinc[i]);
+        rad_abs[i]=std::abs(sol_SL[i+select*nb_dof_output]+uinc[i]);
     }
 
     // Save
     V.print_infos();
-    K.print_infos();
     SL.print_infos();
-    DL.print_infos();
     ddm.print_infos();
     V.save_infos((outputpath+"infos_V.txt").c_str());
-    K.save_infos((outputpath+"infos_K.txt").c_str());
     SL.save_infos((outputpath+"infos_SL.txt").c_str());
-    DL.save_infos((outputpath+"infos_DL.txt").c_str());
     ddm.save_infos((outputpath+"infos_V.txt").c_str(),std::ios_base::app);
-    if (rank==0 && save>0){
+
+    if (rank==0){
+    	WritePointValGmsh(mesh_output,(outputpath+"rad_phase.msh").c_str(),rad_phase);
         WritePointValGmsh(mesh_output,(outputpath+"rad_real.msh").c_str(),rad_real);
         WritePointValGmsh(mesh_output,(outputpath+"rad_abs.msh").c_str(),rad_abs);
     }
-
-
 
     // Finalize the MPI environment.
     MPI_Finalize();

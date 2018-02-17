@@ -153,6 +153,7 @@ int main(int argc, char *argv[]) {
     // Save
     V.print_infos();
     SL.print_infos();
+    ddm.print_infos();
     V.save_infos((outputpath+"infos_V.txt").c_str());
     SL.save_infos((outputpath+"infos_SL.txt").c_str());
     ddm.save_infos((outputpath+"infos_V.txt").c_str(),std::ios_base::app);
