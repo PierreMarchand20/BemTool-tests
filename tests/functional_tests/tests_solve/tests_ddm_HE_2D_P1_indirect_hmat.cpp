@@ -53,7 +53,6 @@ int main(int argc, char *argv[]) {
     Orienting(mesh);
     mesh = unbounded;
     int nb_elt = NbElt(mesh);
-    MPI_Barrier(MPI_COMM_WORLD);
 
     // Mesh
     Geometry node_output(meshname_output);
