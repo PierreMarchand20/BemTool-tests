@@ -1,6 +1,7 @@
 #include <bemtool/tools.hpp>
 #include <bemtool/miscellaneous/htool_wrap.hpp>
 #include <bemtool-tests/tools.hpp>
+#include <unistd.h>
 using namespace bemtool;
 int main(int argc, char *argv[]) {
 
@@ -55,7 +56,7 @@ int main(int argc, char *argv[]) {
     // Mesh
     Geometry node_output(meshname_output);
     int nb_dof_output = NbNode(node_output);
-    Mesh2D mesh_output; mesh_output.Load(node_output,0);
+    Mesh2D mesh_output; mesh_output.Load(node_output,1);
     // Orienting(mesh_output);
     std::vector<htool::R3> x_output(nb_dof_output);
     std::vector<Cplx> uinc(nb_dof_output);
@@ -84,7 +85,7 @@ int main(int argc, char *argv[]) {
     Potential<PotKernel<HE,SL_POT,3,P1_2D>> POT_SL(mesh,kappa);
 
     // Generator
-    BIO_Generator<HE_SL_3D_P1xP1,P1_2D> generator_V(dof,kappa);
+    SubBIO_Generator<HE_SL_3D_P1xP1,P1_2D> generator_V(dof,kappa);
     POT_Generator<PotKernel<HE,SL_POT,3,P1_2D>,P1_2D> generator_SL(POT_SL,dof,node_output);
 
     // Cluster trees

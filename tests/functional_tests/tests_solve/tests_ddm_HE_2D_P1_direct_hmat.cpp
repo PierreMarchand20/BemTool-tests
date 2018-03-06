@@ -90,8 +90,8 @@ int main(int argc, char *argv[]) {
     Potential<PotKernel<HE,DL_POT,2,P1_1D>> POT_DL(mesh,kappa);
 
     // Generator
-    BIO_Generator<HE_SL_2D_P1xP1,P1_1D> generator_V(dof,kappa);
-    BIO_Generator<HE_DL_2D_P1xP1,P1_1D> generator_K(dof,kappa);
+    SubBIO_Generator<HE_SL_2D_P1xP1,P1_1D> generator_V(dof,kappa);
+    SubBIO_Generator<HE_DL_2D_P1xP1,P1_1D> generator_K(dof,kappa);
     POT_Generator<PotKernel<HE,SL_POT,2,P1_1D>,P1_1D> generator_SL(POT_SL,dof,node_output);
     POT_Generator<PotKernel<HE,DL_POT,2,P1_1D>,P1_1D> generator_DL(POT_DL,dof,node_output);
 
