@@ -39,5 +39,6 @@ foreach(equation ${equations})
 endforeach()
 
 
-add_executable(Test test.cpp)
-target_link_libraries(Test bemtool)
+add_executable(Tests_proto_LA_2D_P1_indirect_hmat tests_proto_LA_2D_P1_indirect_hmat.cpp)
+target_link_libraries(Tests_proto_LA_2D_P1_indirect_hmat bemtool)
+
