@@ -13,6 +13,9 @@ list(APPEND operators "HS")
 set(dimensions "2")
 list(APPEND dimensions "3")
 
+add_custom_target(build-tests-functional-operators-2D)
+add_custom_target(build-tests-functional-operators-3D)
+
 foreach(equation ${equations})
   foreach(operator ${operators})
     foreach(dimension ${dimensions})
@@ -20,8 +23,11 @@ foreach(equation ${equations})
     # Tests with hmats
     add_executable(Tests_${equation}_${operator}_${dimension}D_P1xP1_hmat tests_${equation}_${operator}_${dimension}D_P1xP1_hmat.cpp)
     target_link_libraries(Tests_${equation}_${operator}_${dimension}D_P1xP1_hmat bemtool)
-    add_dependencies(build-tests-functional-operators Tests_${equation}_${operator}_${dimension}D_P1xP1_hmat)
+    add_dependencies(build-tests-functional-operators-${dimension}D Tests_${equation}_${operator}_${dimension}D_P1xP1_hmat)
     add_test(NAME Tests_${equation}_${operator}_${dimension}D_P1xP1_hmat COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 2 ${CMAKE_CURRENT_BINARY_DIR}/Tests_${equation}_${operator}_${dimension}D_P1xP1_hmat)
     endforeach()
   endforeach()
 endforeach()
+
+add_dependencies(build-tests-functional-operators build-tests-functional-operators-2D)
+add_dependencies(build-tests-functional-operators build-tests-functional-operators-3D)
