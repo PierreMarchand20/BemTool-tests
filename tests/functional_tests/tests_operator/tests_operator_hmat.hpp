@@ -40,7 +40,6 @@ Real Test_operator_hmat(Real kappa, Real radius, Real lc) {
 
     // Mesh
     MPI_Barrier(MPI_COMM_WORLD);
-    std::cout << (meshname+".msh").c_str() << std::endl;
     Geometry node((meshname+".msh").c_str());
     Mesh<dim> mesh; mesh.Load(node,0);
     Orienting(mesh);
