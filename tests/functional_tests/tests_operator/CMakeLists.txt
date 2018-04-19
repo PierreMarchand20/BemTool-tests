@@ -17,11 +17,6 @@ foreach(equation ${equations})
   foreach(operator ${operators})
     foreach(dimension ${dimensions})
 
-    # # Tests with dense matices
-    # add_executable(Tests_${equation}_${operator}_${dimension}D_P1xP1_dense tests_${equation}_${operator}_D_P1xP1_dense.cpp)
-    # target_include_directories(Tests_${equation}_${operator}_2D_P1xP1_dense PUBLIC ${EIGEN3_INCLUDE_DIR})
-    # target_link_libraries(Tests_${equation}_${operator}_2D_P1xP1_dense bemtool)
-
     # Tests with hmats
     add_executable(Tests_${equation}_${operator}_${dimension}D_P1xP1_hmat tests_${equation}_${operator}_${dimension}D_P1xP1_hmat.cpp)
     target_link_libraries(Tests_${equation}_${operator}_${dimension}D_P1xP1_hmat bemtool)
@@ -30,6 +25,3 @@ foreach(equation ${equations})
     endforeach()
   endforeach()
 endforeach()
-
-
-# add_test(NAME Tests_HE_SL_3D_P1xP1_hmat COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 2 ${CMAKE_CURRENT_BINARY_DIR}/Tests_HE_SL_3D_P1xP1_hmat)
