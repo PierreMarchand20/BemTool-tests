@@ -3,3 +3,6 @@ add_subdirectory(tests_operator)
 add_subdirectory(tests_solve)
 add_subdirectory(tests_solve_multi_rhs)
 add_subdirectory(tests_view)
+
+add_dependencies(build-tests-functional build-tests-functional-operators)
+add_dependencies(build-tests-functional build-tests-functional-potentials)

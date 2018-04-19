@@ -140,5 +140,7 @@ endif()
 #========================== Repertories ======================================#
 #=============================================================================#
 enable_testing()
-add_custom_target(build-functional-tests)
+add_custom_target(build-tests-functional)
+add_custom_target(build-tests-functional-operators)
+add_custom_target(build-tests-functional-potentials)
 add_subdirectory(tests EXCLUDE_FROM_ALL)
