@@ -31,14 +31,31 @@ foreach(equation ${equations})
 # add_executable(Tests_solve_${equation}_3D_P1_dir_hmat tests_solve_${equation}_3D_P1_dir_hmat.cpp)
 # target_link_libraries(Tests_solve_${equation}_3D_P1_dir_hmat bemtool)
 
-      add_executable(Tests_ddm_${equation}_${dimension}_P1_${formulation}_hmat tests_ddm_${equation}_${dimension}_P1_${formulation}_hmat.cpp)
-      target_link_libraries(Tests_ddm_${equation}_${dimension}_P1_${formulation}_hmat bemtool)
+      add_executable(Tests_ddm_dir_${equation}_${dimension}_P1_${formulation}_hmat tests_ddm_dir_${equation}_${dimension}_P1_${formulation}_hmat.cpp)
+      target_link_libraries(Tests_ddm_dir_${equation}_${dimension}_P1_${formulation}_hmat bemtool)
 
     endforeach()
   endforeach()
 endforeach()
 
 
-add_executable(Tests_proto_LA_2D_P1_indirect_hmat tests_proto_LA_2D_P1_indirect_hmat.cpp)
-target_link_libraries(Tests_proto_LA_2D_P1_indirect_hmat bemtool)
+add_executable(Tests_proto_YU_2D_P1_indirect_hmat tests_proto_YU_2D_P1_indirect_hmat.cpp)
+target_link_libraries(Tests_proto_YU_2D_P1_indirect_hmat bemtool)
 
+# add_executable(Tests_ddm_ff tests_ddm_ff.cpp)
+# target_link_libraries(Tests_ddm_ff bemtool)
+#
+# add_executable(Tests_ddm_dir_YU_2D_P1_indirect_hmat tests_ddm_dir_YU_2D_P1_indirect_hmat.cpp)
+# target_link_libraries(Tests_ddm_dir_YU_2D_P1_indirect_hmat bemtool)
+#
+# add_executable(Tests_ddm_dir_YU_3D_P1_indirect_hmat tests_ddm_dir_YU_3D_P1_indirect_hmat.cpp)
+# target_link_libraries(Tests_ddm_dir_YU_3D_P1_indirect_hmat bemtool)
+#
+# add_executable(Tests_ddm_neu_YU_3D_P1_indirect_hmat tests_ddm_neu_YU_3D_P1_indirect_hmat.cpp)
+# target_link_libraries(Tests_ddm_neu_YU_3D_P1_indirect_hmat bemtool)
+#
+# add_executable(Tests_ddm_dir_LA_2D_P1_indirect_hmat tests_ddm_dir_LA_2D_P1_indirect_hmat.cpp)
+# target_link_libraries(Tests_ddm_dir_LA_2D_P1_indirect_hmat bemtool)
+#
+# add_executable(Tests_ddm_neu_YU_2D_P1_indirect_hmat tests_ddm_neu_YU_2D_P1_indirect_hmat.cpp)
+# target_link_libraries(Tests_ddm_neu_YU_2D_P1_indirect_hmat bemtool)
