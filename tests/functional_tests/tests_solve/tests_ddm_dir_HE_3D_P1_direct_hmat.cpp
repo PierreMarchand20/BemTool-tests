@@ -28,8 +28,7 @@ int main(int argc, char *argv[]) {
     std::string meshname_output = argv[2];
     std::string outputpath = argv[3];
     int save = StrToNbr<int>(argv[5]); // 0 no save, 1 sol, 2 video
-    double frequency = StrToNbr<double>(argv[4])*1e9;
-    double c0= 299792548;
+    double frequency = StrToNbr<double>(argv[4]);
     double kappa = 2*pi*frequency/c0;
 
 
@@ -192,8 +191,24 @@ int main(int argc, char *argv[]) {
     DL.save_infos((outputpath+"infos_DL.txt").c_str());
     ddm.save_infos((outputpath+"infos_V.txt").c_str(),std::ios_base::app);
     if (rank==0 && save>0){
-        WritePointValGmsh(mesh_output,(outputpath+"rad_real.msh").c_str(),rad_real);
-        WritePointValGmsh(mesh_output,(outputpath+"rad_abs.msh").c_str(),rad_abs);
+        if (save==1){
+            std::vector<Real> output_real(nb_dof_output),output_abs(nb_dof_output),output_trace_real(nb_dof),output_trace_abs(nb_dof);
+            for (int j=0;j<nb_dof;j++){
+                output_trace_real[j]=std::real(sol[j]);
+                output_trace_abs[j]=std::abs(sol[j]);
+            }
+            for (int j=0;j<nb_dof_output;j++){
+                output_real[j]=std::real(sol_SL[j]);
+                output_abs[j]=std::abs(sol_SL[j]);
+            }
+            WritePointValParaview(mesh_output,(outputpath+"output_paraview_rad_real.scl").c_str(),output_real);
+            WriteCaseParaview((outputpath+"output_paraview_rad_real.case").c_str(),"output_paraview_mesh.geo","rad_real","output_paraview_rad_real.scl");
+            WritePointValGmsh(mesh_output,(outputpath+"output_gmsh_rad_real.msh").c_str(),output_real);
+            WritePointValGmsh(mesh_output,(outputpath+"output_gmsh_rad_abs.msh").c_str(),output_abs);
+            WritePointValGmsh(mesh,(outputpath+"output_gmsh_trace_read.msh").c_str(),output_trace_real);
+            WritePointValGmsh(mesh,(outputpath+"output_gmsh_trace_abs.msh").c_str(),output_trace_abs);
+        }
+
     }
 
 

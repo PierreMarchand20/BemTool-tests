@@ -31,8 +31,7 @@ int main(int argc, char *argv[]) {
     std::string meshname_output = argv[2];
     std::string outputpath = argv[3];
     int save = StrToNbr<int>(argv[5]); // 0 no save, 1 sol, 2 video
-    double frequency = StrToNbr<double>(argv[4])*1e9;
-    double c0= 299792548;
+    double frequency = StrToNbr<double>(argv[4]);
     double kappa = 2*pi*frequency/c0;
 
     // HTOOL variable
