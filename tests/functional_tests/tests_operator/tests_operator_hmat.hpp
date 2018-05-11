@@ -57,7 +57,7 @@ Real Test_operator_hmat(Real kappa, Real radius, Real lc) {
     }
 
     // Generator
-    SubBIO_Generator<OperatorType,Discretization> generator(dof,kappa);
+    BIO_Generator<OperatorType,Discretization> generator(dof,kappa);
 
     // HMatrix
     htool::HMatrix<htool::partialACA,Cplx> A(generator,x);
@@ -95,6 +95,7 @@ Real Test_operator_hmat(Real kappa, Real radius, Real lc) {
 
     // Error
     Cplx refsol = RefEigenvalue<OperatorType>::Compute(n,radius,kappa);
+    std::cout << sum <<  " "<< refsol << std::endl;
     if (std::abs(refsol)<1e-16){
         return sqrt(abs(sum - refsol));
     }

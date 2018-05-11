@@ -1,0 +1,144 @@
+sudo: false
+
+# Git options
+git:
+  submodules: false
+
+# Enable c++ support
+language: cpp
+
+
+# Compiler selection
+matrix:
+  include:
+    # Tests on osx
+    - os: osx
+      env:
+        - CXX_COMPILER=clang++
+        - C_COMPILER=clang
+        - MPIEXEC_PREFLAGS=-oversubscribe
+      install:
+        - brew update
+        - brew cask uninstall oclint
+        - brew install openmpi
+        - brew install gmsh --with-opencascade
+        - brew install boost
+
+    - os: osx
+      env:
+        - CXX_COMPILER=g++-8
+        - C_COMPILER=gcc-8
+      install:
+        - brew update
+        - brew cask uninstall oclint
+        - brew install gcc
+        - brew install openmpi
+        - MPIEXEC_PREFLAGS=-oversubscribe
+        - brew install gmsh --with-opencascade
+        - brew install boost
+
+    # # Tests on linux
+    # # - os: linux
+    # #   dist: trusty
+    # #   group: travis_latest
+    # #   env:
+    # #     - CXX_COMPILER=g++-4.9
+    # #     - C_COMPILER=gcc-4.9
+    # #   addons:
+    # #     apt:
+    # #       sources:
+    # #         - ubuntu-toolchain-r-test
+    # #       packages:
+    # #         - g++-4.9
+    # #         - cmake
+    # #         - openmpi-bin
+    # #         - libopenmpi-dev
+    # #         - libblas-dev
+    # #         - liblapack-dev
+    # #         # - libmumps-dev
+    # #         - libsuitesparse-dev
+    # #
+    # # - os: linux
+    # #   dist: trusty
+    # #   group: travis_latest
+    # #   env:
+    # #     - CXX_COMPILER=clang++-3.6
+    # #     - C_COMPILER=clang-3.6
+    # #   addons:
+    # #     apt:
+    # #       sources:
+    # #         - ubuntu-toolchain-r-test
+    # #         - llvm-toolchain-precise-3.6
+    # #       packages:
+    # #         - clang-3.6
+    # #         - cmake
+    # #         - openmpi-bin
+    # #         - libopenmpi-dev
+    # #         - libblas-dev
+    # #         - liblapack-dev
+    # #         # - libmumps-dev
+    # #         - libsuitesparse-dev
+    #
+    # - os: linux
+    #   dist: trusty
+    #   group: travis_latest
+    #   env:
+    #     - CXX_COMPILER=g++-4.9
+    #     - C_COMPILER=gcc-4.9
+    #   addons:
+    #     apt:
+    #       sources:
+    #         - ubuntu-toolchain-r-test
+    #       packages:
+    #         - g++-4.9
+    #         - cmake
+    #         - mpich
+    #         - libmpich-dev
+    #         - libblas-dev
+    #         - liblapack-dev
+    #         # - libmumps-dev
+    #         - libsuitesparse-dev
+    #
+    # - os: linux
+    #   dist: trusty
+    #   group: travis_latest
+    #   env:
+    #     - CXX_COMPILER=clang++-3.6
+    #     - C_COMPILER=clang-3.6
+    #   addons:
+    #     apt:
+    #       sources:
+    #         - ubuntu-toolchain-r-test
+    #         - llvm-toolchain-precise-3.6
+    #       packages:
+    #         - clang-3.6
+    #         - cmake
+    #         - mpich
+    #         - libmpich-dev
+    #         - libblas-dev
+    #         - liblapack-dev
+    #         # - libmumps-dev
+    #         - libsuitesparse-dev
+
+
+
+
+
+# Updates
+before_install:
+  - cd .. && git clone https://github.com/xclaeys/BemTool.git
+  - git clone https://github.com/hpddm/hpddm.git
+  - git clone https://github.com/PierreMarchand20/htool.git && cd BemTool-tests
+
+
+before_script:
+  - which $CXX_COMPILER
+  - mkdir build
+  - cd build
+
+# Build steps
+script:
+  - CC=$C_COMPILER CXX=$CXX_COMPILER cmake ../ -DMPIEXEC_PREFLAGS=${MPIEXEC_PREFLAGS}
+  - make -j build-tests-functional
+  - export OMP_NUM_THREADS=2
+  - ctest --output-on-failure
