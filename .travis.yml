@@ -21,7 +21,7 @@ matrix:
         - brew update
         - brew cask uninstall oclint
         - brew install openmpi
-        - brew install gmsh --with-opencascade
+        - travis_wait brew install gmsh --with-opencascade
         - brew install boost
 
     - os: osx
@@ -34,7 +34,7 @@ matrix:
         - brew install gcc
         - brew install openmpi
         - MPIEXEC_PREFLAGS=-oversubscribe
-        - brew install gmsh --with-opencascade
+        - travis_wait brew install gmsh --with-opencascade
         - brew install boost
 
     # # Tests on linux
