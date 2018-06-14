@@ -2,6 +2,7 @@
 #include <bemtool/miscellaneous/htool_wrap.hpp>
 #include <bemtool-tests/tools.hpp>
 #include "bemtool-tests/miscellaneous/view.hpp"
+#include <htool/visu/view.hpp>
 
 using namespace htool;
 int main(int argc, char *argv[]) {

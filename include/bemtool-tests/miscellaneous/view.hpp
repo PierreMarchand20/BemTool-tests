@@ -12,8 +12,8 @@
 
 typedef std::complex<double> K;
 
-#include <htool/view.hpp>
 #include <bemtool/tools.hpp>
+#include <htool/visu/view.hpp>
 
 namespace bemtool{
 
@@ -83,7 +83,7 @@ void attach_ui(htool::Scene& s) {
                     }
 
                     // Generator
-                    SubBIO_Generator<LA_SL_3D_P1xP1,P1_2D>* generator = new SubBIO_Generator<LA_SL_3D_P1xP1,P1_2D>(dof,kappa);
+                    BIO_Generator<LA_SL_3D_P1xP1,P1_2D>* generator = new BIO_Generator<LA_SL_3D_P1xP1,P1_2D>(dof,kappa);
 
 
 
