@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
     A.print_infos();
 
     // Compute error
-    double error = Frobenius_absolute_error(A,generator)
+    double error = Frobenius_absolute_error(A,generator);
     if (rank==0) {
         std::cout << "Error : "<<error<< std::endl;
     }
