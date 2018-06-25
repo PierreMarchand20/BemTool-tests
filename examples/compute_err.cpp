@@ -59,9 +59,11 @@ int main(int argc, char *argv[]) {
     // HMatrix
     htool::HMatrix<htool::partialACA,Cplx> A(generator,t,x);
     A.print_infos();
+
     // Compute error
+    double error = Frobenius_absolute_error(A,generator)
     if (rank==0) {
-        std::cout << "Error : "<<Frobenius_absolute_error(A,generator)<< std::endl;
+        std::cout << "Error : "<<error<< std::endl;
     }
 
 
