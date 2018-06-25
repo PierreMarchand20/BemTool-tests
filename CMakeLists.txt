@@ -139,6 +139,8 @@ endif()
 #=============================================================================#
 #========================== Repertories ======================================#
 #=============================================================================#
+add_subdirectory(examples EXCLUDE_FROM_ALL)
+
 enable_testing()
 add_custom_target(build-tests-functional)
 add_custom_target(build-tests-functional-operators)
