@@ -32,9 +32,6 @@ option(BEMTOOL_WITH_GUI      "Build bemtool visualization tools ?" OFF)
 find_package(BemTool REQUIRED)
 list(APPEND BEMTOOL_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
-# EIGEN3
-find_package(EIGEN3)
-
 # Boost package - special functions
 find_package(Boost REQUIRED)
 
@@ -72,6 +69,10 @@ message("-- Found Blas implementation:" "${BLAS_LIBRARIES}")
 # LAPACK
 find_package(LAPACK)
 message("-- Found Lapack:" "${LAPACK_LIBRARIES}")
+
+ # Elemental
+find_package(Elemental HINTS ${Elemental_ROOT_DIR})
+message("-- Found Elemental:" "${Elemental_INCLUDE_DIRS}")
 
 #=============================================================================#
 #=========================== Libraries =======================================#
@@ -122,13 +123,16 @@ target_include_directories(bemtool INTERFACE
 					${Boost_INCLUDE_DIRS}
 					${HTOOL_INCLUDE_DIR}
 					${MPI_INCLUDE_PATH}
-					${HPDDM_INCLUDE_DIR})
+					${HPDDM_INCLUDE_DIR}
+                    ${Elemental_INCLUDE_DIRS}
+                    )
 
 target_link_libraries(bemtool INTERFACE
 					${MPI_LIBRARIES}
 					${BLAS_LIBRARIES}
                     ${LAPACK_LIBRARIES}
-                    ${SUITESPARSE_LIBRARIES}
+                    # ${SUITESPARSE_LIBRARIES}
+                    ${Elemental_LIBRARIES}
                     )
 
 # For headers to show in IDE
