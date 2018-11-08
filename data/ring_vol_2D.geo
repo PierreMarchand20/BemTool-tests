@@ -1,7 +1,7 @@
 SetFactory("OpenCASCADE");
-h=0.05;
+h=0.1;
 Mesh.CharacteristicLengthMin = h;
 Mesh.CharacteristicLengthMax = h;
-Disk(1) = {0,0,0,1.2};
-Disk(2) = {0,0,0,4};
+Disk(1) = {0,0,0,1.1};
+Disk(2) = {0,0,0,1.9};
 BooleanDifference{Surface{2}; Delete;}{Surface{1}; Delete;}

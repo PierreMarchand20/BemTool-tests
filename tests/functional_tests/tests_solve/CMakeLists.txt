@@ -42,6 +42,18 @@ endforeach()
 add_executable(Tests_proto_YU_2D_P1_indirect_hmat tests_proto_YU_2D_P1_indirect_hmat.cpp)
 target_link_libraries(Tests_proto_YU_2D_P1_indirect_hmat bemtool)
 
+add_executable(Tests_proto_YU_3D_P1_indirect_hmat tests_proto_YU_3D_P1_indirect_hmat.cpp)
+target_link_libraries(Tests_proto_YU_3D_P1_indirect_hmat bemtool)
+
+add_executable(Tests_ddm_dir_YU_2D_P1_indirect_hmat tests_ddm_dir_YU_2D_P1_indirect_hmat.cpp)
+target_link_libraries(Tests_ddm_dir_YU_2D_P1_indirect_hmat bemtool)
+
+add_executable(Tests_ddm_dir_LA_2D_P1_indirect_hmat tests_ddm_dir_LA_2D_P1_indirect_hmat.cpp)
+target_link_libraries(Tests_ddm_dir_LA_2D_P1_indirect_hmat bemtool)
+
+add_executable(Tests_calderon_dir_LA_2D_P1_indirect_hmat tests_calderon_dir_LA_2D_P1_indirect_hmat.cpp)
+target_link_libraries(Tests_calderon_dir_LA_2D_P1_indirect_hmat bemtool)
+
 # add_executable(Tests_ddm_ff tests_ddm_ff.cpp)
 # target_link_libraries(Tests_ddm_ff bemtool)
 #

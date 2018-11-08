@@ -1,5 +1,5 @@
 SetFactory("OpenCASCADE");
-h=0.005;
+h=0.0001;
 Mesh.CharacteristicLengthMin = h;
 Mesh.CharacteristicLengthMax = h;
 Circle(1) = {0,0,0,1};
