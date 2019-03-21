@@ -1,3 +1,4 @@
+Mesh.MshFileVersion = 2.2;
 SetFactory("OpenCASCADE");
 h=0.05;
 Mesh.CharacteristicLengthMin = h;

@@ -24,7 +24,7 @@ std::vector<std::pair<int,int>> boundary_edges(Dof< BasisFct<P1,dim>> dof){
         const array<dim+1,int>& jdof = dof[i];
         for (int j=0;j<dim+1;j++){
             int v0 = jdof[j%(dim+1)];
-            int v1 = jdof[(j+1)(dim+1)];
+            int v1 = jdof[(j+1)%(dim+1)];
             if (v1<v0){
                 int c =v0;
                 v0=v1;

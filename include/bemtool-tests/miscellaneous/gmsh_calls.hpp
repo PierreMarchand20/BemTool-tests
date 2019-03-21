@@ -17,6 +17,7 @@ inline void gmsh_circle(std::string mesh_name, Real R, Real lc, int verbose=0){
 	std::ofstream circle((mesh_name+".geo").c_str());
     if (circle.is_open()) {
         circle << "SetFactory(\"OpenCASCADE\");"<<std::endl;
+		circle << "Mesh.MshFileVersion = 2.2;"<<std::endl;
         circle << "h = "<<NbrToStr(lc)<<";"<<std::endl;
         circle << "Mesh.CharacteristicLengthMin = h;"<<std::endl;
         circle << "Mesh.CharacteristicLengthMax = h;"<<std::endl;
@@ -35,6 +36,7 @@ inline void gmsh_disc(std::string mesh_name, Real R, Real lc, int verbose=0){
 	std::ofstream circle((mesh_name+".geo").c_str());
     if (circle.is_open()) {
         circle << "SetFactory(\"OpenCASCADE\");"<<std::endl;
+		circle << "Mesh.MshFileVersion = 2.2;"<<std::endl;
         circle << "h = "<<NbrToStr(lc)<<";"<<std::endl;
         circle << "Mesh.CharacteristicLengthMin = h;"<<std::endl;
         circle << "Mesh.CharacteristicLengthMax = h;"<<std::endl;
@@ -53,6 +55,7 @@ inline void gmsh_sphere(std::string mesh_name, Real R, Real lc, int verbose=0){
 	std::ofstream sphere((mesh_name+".geo").c_str());
 	if (sphere.is_open()) {
 		sphere << "SetFactory(\"OpenCASCADE\");"<<std::endl;
+		sphere << "Mesh.MshFileVersion = 2.2;"<<std::endl;
 		sphere << "h = "<<NbrToStr(lc)<<";"<<std::endl;
 		sphere << "Mesh.CharacteristicLengthMin = h;"<<std::endl;
 		sphere << "Mesh.CharacteristicLengthMax = h;"<<std::endl;
@@ -71,6 +74,7 @@ inline void gmsh_ball(std::string mesh_name, Real R, Real lc, int verbose=0){
 	std::ofstream ball((mesh_name+".geo").c_str());
 	if (ball.is_open()) {
 		ball << "SetFactory(\"OpenCASCADE\");"<<std::endl;
+		ball << "Mesh.MshFileVersion = 2.2;"<<std::endl;
 		ball << "h = "<<NbrToStr(lc)<<";"<<std::endl;
 		ball << "Mesh.CharacteristicLengthMin = h;"<<std::endl;
 		ball << "Mesh.CharacteristicLengthMax = h;"<<std::endl;

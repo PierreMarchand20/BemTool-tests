@@ -24,7 +24,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake-modules")
 
 # Options
 option(BEMTOOL_WITH_GUI      "Build bemtool visualization tools ?" OFF)
-
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 #=============================================================================#
 #========================== External Libraries ===============================#
 #=============================================================================#
