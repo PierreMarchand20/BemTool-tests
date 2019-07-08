@@ -24,7 +24,7 @@ double Test_potential_2D_hmat(Real kappa, Real radius, Real lc, Real lc_output) 
   }
   MPI_Barrier(MPI_COMM_WORLD);
   Geometry node("circle.msh");
-  Mesh1D mesh; mesh.Load(node,0);
+  Mesh1D mesh; mesh.Load(node);
   Orienting(mesh);
   int nb_elt = NbElt(mesh);
   MPI_Barrier(MPI_COMM_WORLD);
@@ -39,7 +39,7 @@ double Test_potential_2D_hmat(Real kappa, Real radius, Real lc, Real lc_output) 
   MPI_Barrier(MPI_COMM_WORLD);
   Geometry node_output("disc.msh");
   int nb_dof_output = NbNode(node_output);
-  Mesh2D mesh_output; mesh_output.Load(node_output,0);
+  Mesh2D mesh_output; mesh_output.Load(node_output);
   Orienting(mesh_output);
   MPI_Barrier(MPI_COMM_WORLD);
   if (rank==0){
