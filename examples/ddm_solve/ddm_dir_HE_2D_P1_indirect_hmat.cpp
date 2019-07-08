@@ -196,7 +196,6 @@ int main(int argc, char *argv[]) {
     opt.parse("-hpddm_schwarz_method asm");
     ddm.facto_one_level();
     ddm.solve(rhs.data(),sol.data());
-    ddm.print_infos();
 
     // Radiated field
     if (rank==0)
