@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
     if (rank==0)
         std::cout << "Loading mesh" << std::endl;
     Geometry node(meshname);
-    Mesh2D mesh; mesh.Load(node,0);
+    Mesh2D mesh; mesh.Load(node);
     Orienting(mesh);
     mesh = unbounded;
     int nb_elt = NbElt(mesh);
@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
         std::cout << "Loading output mesh" << std::endl;
     Geometry node_output(meshname_output);
     int nb_dof_output = NbNode(node_output);
-    Mesh2D mesh_output; mesh_output.Load(node_output,0);
+    Mesh2D mesh_output; mesh_output.Load(node_output);
     std::vector<htool::R3> x_output(nb_dof_output);
     std::vector<Cplx> uinc(nb_dof_output);
     std::vector<double> uinc_real(nb_dof_output),uinc_abs(nb_dof_output);
