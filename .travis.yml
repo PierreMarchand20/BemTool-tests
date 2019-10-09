@@ -19,9 +19,8 @@ matrix:
         - MPIEXEC_PREFLAGS=-oversubscribe
       install:
         - brew update
-        - brew cask uninstall oclint
         - brew install openmpi
-        - travis_wait brew install gmsh --with-opencascade
+        - brew install gmsh
         - brew install boost
 
     - os: osx
@@ -30,11 +29,10 @@ matrix:
         - C_COMPILER=gcc-8
       install:
         - brew update
-        - brew cask uninstall oclint
         - brew install gcc
         - brew install openmpi
         - MPIEXEC_PREFLAGS=-oversubscribe
-        - travis_wait brew install gmsh --with-opencascade
+        - brew install gmsh
         - brew install boost
 
     # # Tests on linux
