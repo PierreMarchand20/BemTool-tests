@@ -21,7 +21,6 @@ matrix:
         - brew update
         - brew install openmpi
         - brew install gmsh
-        - brew install boost
 
     - os: osx
       env:
@@ -33,7 +32,6 @@ matrix:
         - brew install openmpi
         - MPIEXEC_PREFLAGS=-oversubscribe
         - brew install gmsh
-        - brew install boost
 
     # # Tests on linux
     # # - os: linux
