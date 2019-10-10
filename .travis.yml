@@ -128,7 +128,6 @@ before_install:
 
 
 before_script:
-  - which $CXX_COMPILER
   - mkdir build
   - cd build
 
