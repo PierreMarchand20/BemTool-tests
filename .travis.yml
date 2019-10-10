@@ -18,7 +18,6 @@ matrix:
         - C_COMPILER=clang
         - MPIEXEC_PREFLAGS=-oversubscribe
       install:
-        - brew update
         - brew install openmpi
         - brew install gmsh
 
@@ -26,11 +25,10 @@ matrix:
       env:
         - CXX_COMPILER=g++-9
         - C_COMPILER=gcc-9
+        - MPIEXEC_PREFLAGS=-oversubscribe
       install:
-        - brew update
         - brew install gcc
         - brew install openmpi
-        - MPIEXEC_PREFLAGS=-oversubscribe
         - brew install gmsh
 
     # # Tests on linux
@@ -121,20 +119,24 @@ matrix:
 
 
 # Updates
-before_install:
+before_install:  
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew upgrade cmake; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install suite-sparse; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then export LD_LIBRARY_PATH=$(if [[ $CC == "clang" ]]; then echo -n '/usr/local/clang/lib'; fi); fi
   - cd .. && git clone https://github.com/PierreMarchand20/BemTool.git
   - git clone https://github.com/hpddm/hpddm.git
   - git clone https://github.com/PierreMarchand20/htool.git && cd BemTool-tests
 
 
 before_script:
-  - which $CXX_COMPILER
+  - which $CXX
   - mkdir build
   - cd build
 
 # Build steps
 script:
-  - CC=$C_COMPILER CXX=$CXX_COMPILER cmake ../ -DMPIEXEC_PREFLAGS=${MPIEXEC_PREFLAGS}
+  - cmake ../ -DMPIEXEC_PREFLAGS=${MPIEXEC_PREFLAGS}
   - make -j build-tests-functional
   - export OMP_NUM_THREADS=2
   - ctest --output-on-failure
