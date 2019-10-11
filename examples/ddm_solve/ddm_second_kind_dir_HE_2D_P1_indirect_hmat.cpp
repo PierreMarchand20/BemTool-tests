@@ -76,13 +76,14 @@ int main(int argc, char *argv[]) {
     if (rank==0)
         std::cout << "Loading mesh" << std::endl;
     Geometry node(meshname);
-    Mesh2D mesh; mesh.Load(node);
+    Mesh1D mesh; mesh.Load(node);
     Orienting(mesh);
     mesh = unbounded;
     int nb_elt = NbElt(mesh);
-    std::vector<R3> normal = NormalTo(mesh);
 
     // Mesh
+    if (rank==0)
+        std::cout << "Loading output mesh" << std::endl;
     Geometry node_output(meshname_output);
     int nb_dof_output = NbNode(node_output);
     Mesh2D mesh_output; mesh_output.Load(node_output);
@@ -106,7 +107,7 @@ int main(int argc, char *argv[]) {
     // Dof
     if (rank==0)
        std::cout << "Creating dof" << std::endl;
-    Dof<P1_2D> dof(mesh);
+    Dof<P1_1D> dof(mesh);
     int nb_dof = NbDof(dof);
     std::vector<htool::R3> x(nb_dof);
     for (int i=0;i<nb_dof;i++){
@@ -116,13 +117,13 @@ int main(int argc, char *argv[]) {
     }
 
   	// Operator
-  	Potential<PotKernel<HE,DL_POT,3,P1_2D>> POT_DL(mesh,kappa);
+  	Potential<PotKernel<HE,DL_POT,2,P1_1D>> POT_DL(mesh,kappa);
 
     // Generator
     if (rank==0)
        std::cout << "Creating generators"<<std::endl;
-    BIO_Generator<HE_HS_3D_P1xP1,P1_2D> generator_W(dof,kappa);
-    POT_Generator<PotKernel<HE,DL_POT,3,P1_2D>,P1_2D> generator_DL(POT_DL,dof,node_output);
+    BIO_Generator_w_mass<HE_DL_2D_P1xP1,P1_1D> generator_DL(dof,kappa,0.5);
+    POT_Generator<PotKernel<HE,DL_POT,2,P1_1D>,P1_1D> generator_pot_DL(POT_DL,dof,node_output);
 
     // Weights
     if (rank==0)
@@ -135,17 +136,16 @@ int main(int argc, char *argv[]) {
             
         }
     }
+
   	// Cluster trees
-    if (rank==0)
-       std::cout << "Creating cluster tree" << std::endl;
   	std::shared_ptr<htool::Cluster_tree> t_output=std::make_shared<htool::Cluster_tree>(x_output);
     std::shared_ptr<htool::Cluster_tree> t=std::make_shared<htool::Cluster_tree>(x,std::vector<double>(x.size(),0),g);
 
     // HMatrix
     if (rank==0)
 	   std::cout << "Building Hmatrix" << std::endl;
-    htool::HMatrix<htool::partialACA,Cplx> W(generator_W,t,x);
-    htool::HMatrix<htool::partialACA,Cplx> DL(generator_DL,t_output,x_output,t,x);
+    htool::HMatrix<htool::partialACA,Cplx> DL(generator_DL,t,x);
+    htool::HMatrix<htool::partialACA,Cplx> pot_DL(generator_pot_DL,t_output,x_output,t,x);
 
     // Right-hand side
     if (rank==0)
@@ -157,8 +157,8 @@ int main(int argc, char *argv[]) {
         const array<2,R3> xdof = dof(i);
         R2x2 M_local = MassP1(mesh[i]);
         C2 Uinc;
-        Uinc[0]= iu*kappa*dir[0]*normal[i][0]*exp( iu*kappa*(xdof[0],dir) );
-        Uinc[1]= iu*kappa*dir[1]*normal[i][1]*exp( iu*kappa*(xdof[1],dir) );
+        Uinc[0]= exp( iu*kappa*(xdof[0],dir) );
+        Uinc[1]= exp( iu*kappa*(xdof[1],dir) );
 
         for(int k=0;k<2;k++){
             rhs[jdof[k]] -= (M_local(k,0)*Uinc[0]+M_local(k,1)*Uinc[1]);
@@ -173,7 +173,7 @@ int main(int argc, char *argv[]) {
     std::vector<int> neighbors;
     std::vector<std::vector<int> > intersections;
 
-    Partition(W.get_MasterOffset_t(), W.get_permt(),dof,cluster_to_ovr_subdomain,ovr_subdomain_to_global,neighbors,intersections);
+    Partition(DL.get_MasterOffset_t(), DL.get_permt(),dof,cluster_to_ovr_subdomain,ovr_subdomain_to_global,neighbors,intersections);
 
     // Visu overlap
     if (save>0){
@@ -190,16 +190,15 @@ int main(int argc, char *argv[]) {
     // Solve
     std::vector<Cplx> sol(nb_dof,0);
     std::vector<double> sol_abs(nb_dof),sol_real(nb_dof);
-    htool::DDM<htool::partialACA,Cplx> ddm(generator_W,W,ovr_subdomain_to_global,cluster_to_ovr_subdomain,neighbors,intersections);
-    opt.parse("-hpddm_schwarz_method asm");
+    htool::DDM<htool::partialACA,Cplx> ddm(generator_DL,DL,ovr_subdomain_to_global,cluster_to_ovr_subdomain,neighbors,intersections);
+    // opt.parse("-hpddm_schwarz_method n");
     ddm.facto_one_level();
     ddm.solve(rhs.data(),sol.data());
-
 
     // Radiated field
     if (rank==0)
         std::cout << "Radiated field" << std::endl;
-    std::vector<Cplx> sol_DL=DL*sol;
+    std::vector<Cplx> sol_DL=pot_DL*sol;
     std::vector<double> rad_real(nb_dof_output,0),rad_phase(nb_dof_output,0),rad_abs(nb_dof_output,0);
 
     for (int i =0;i<nb_dof_output;i++){
@@ -209,13 +208,13 @@ int main(int argc, char *argv[]) {
     }
 
     // Save
-    W.print_infos();
     DL.print_infos();
+    pot_DL.print_infos();
     ddm.print_infos();
-    W.save_infos((outputpath+"infos_W.txt").c_str());
-    DL.save_infos((outputpath+"infos_DL.txt").c_str());
+    DL.save_infos((outputpath+"infos_V.txt").c_str());
+    pot_DL.save_infos((outputpath+"infos_SL.txt").c_str());
     ddm.save_infos((outputpath+"solve.txt").c_str());
-
+std::cout << save << std::endl;
     if (rank==0 && save>0){
         WritePointValGmsh(mesh_output,(outputpath+"rad_phase.msh").c_str(),rad_phase);
         WritePointValGmsh(mesh_output,(outputpath+"rad_real.msh").c_str(),rad_real);

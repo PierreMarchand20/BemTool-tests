@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
         std::forward_as_tuple("outputpath=<output>", "output path", HPDDM::Option::Arg::argument),
         std::forward_as_tuple("kappa=<1>", "kappa.", HPDDM::Option::Arg::numeric),
         std::forward_as_tuple("overlap=<1>", "overlap.", HPDDM::Option::Arg::integer),
-        std::forward_as_tuple("save=<0>", "integer", HPDDM::Option::Arg::argument),
+        std::forward_as_tuple("save=<0>", "integer", HPDDM::Option::Arg::integer),
         std::forward_as_tuple("epsilon=<0.01>", "epsilon.", HPDDM::Option::Arg::numeric),
         std::forward_as_tuple("eta=<10>", "eta.", HPDDM::Option::Arg::numeric),
         std::forward_as_tuple("mintargetdepth=<1>", "mintargetdepth.", HPDDM::Option::Arg::numeric),
