@@ -27,7 +27,6 @@ int main(int argc, char *argv[]) {
         std::forward_as_tuple("eta=<10>", "eta.", HPDDM::Option::Arg::numeric),
         std::forward_as_tuple("mintargetdepth=<1>", "mintargetdepth.", HPDDM::Option::Arg::numeric),
         std::forward_as_tuple("minsourcedepth=<1>", "minsourcedepth.", HPDDM::Option::Arg::numeric),
-        std::forward_as_tuple("coefficient=<1>", "coefficient for Combined field.", HPDDM::Option::Arg::numeric),
     });
     if(rank != 0)
         opt.remove("verbosity");
@@ -62,11 +61,9 @@ int main(int argc, char *argv[]) {
     // kappa
     double kappa = opt.app()["kappa"];
 
-    // 
-    double coefficient = opt.app()["coefficient"];
-
     // other datas
     R3 dir; dir[0]=1./std::sqrt(2);dir[1]=1./std::sqrt(2);dir[2]=0;
+    Cplx combined_coef=iu;
 
     //////////////////////////////////////////// HTOOL variable
     htool::SetNdofPerElt(1);
@@ -127,7 +124,7 @@ int main(int argc, char *argv[]) {
     // Generator
     if (rank==0)
        std::cout << "Creating generators"<<std::endl;
-    Combined_BIO_Generator<HE_SL_2D_P1xP1,HE_DL_2D_P1xP1,P1_1D> generator_CBIO(dof,kappa,1,0.5);
+    Combined_BIO_Generator<HE_SL_2D_P1xP1,HE_DL_2D_P1xP1,P1_1D> generator_CBIO(dof,kappa,combined_coef,0.5);
     POT_Generator<PotKernel<HE,SL_POT,2,P1_1D>,P1_1D> generator_pot_SL(POT_SL,dof,node_output);
     POT_Generator<PotKernel<HE,DL_POT,2,P1_1D>,P1_1D> generator_pot_DL(POT_DL,dof,node_output);
 
@@ -210,7 +207,7 @@ int main(int argc, char *argv[]) {
     std::vector<Cplx> sol_vol(nb_dof_output,0);
 
     for (int i =0 ;i<nb_dof_output;i++){
-        sol_vol[i]=coefficient*sol_SL[i]+sol_DL[i];
+        sol_vol[i]=combined_coef*sol_SL[i]+sol_DL[i];
     }
 
 
@@ -231,7 +228,7 @@ int main(int argc, char *argv[]) {
     pot_SL.save_infos((outputpath+"infos_SL.txt").c_str());
     pot_DL.save_infos((outputpath+"infos_DL.txt").c_str());
     ddm.save_infos((outputpath+"solve.txt").c_str());
-std::cout << save << std::endl;
+
     if (rank==0 && save>0){
         WritePointValGmsh(mesh_output,(outputpath+"rad_phase.msh").c_str(),rad_phase);
         WritePointValGmsh(mesh_output,(outputpath+"rad_real.msh").c_str(),rad_real);

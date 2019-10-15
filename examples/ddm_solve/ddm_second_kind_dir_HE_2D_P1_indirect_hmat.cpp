@@ -214,7 +214,7 @@ int main(int argc, char *argv[]) {
     DL.save_infos((outputpath+"infos_V.txt").c_str());
     pot_DL.save_infos((outputpath+"infos_SL.txt").c_str());
     ddm.save_infos((outputpath+"solve.txt").c_str());
-std::cout << save << std::endl;
+
     if (rank==0 && save>0){
         WritePointValGmsh(mesh_output,(outputpath+"rad_phase.msh").c_str(),rad_phase);
         WritePointValGmsh(mesh_output,(outputpath+"rad_real.msh").c_str(),rad_real);
