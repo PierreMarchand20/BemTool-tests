@@ -153,15 +153,16 @@ int main(int argc, char *argv[]) {
     std::vector<Cplx> rhs(nb_dof,0);
     std::vector<double> rhs_real(nb_dof,0),rhs_abs(nb_dof,0);
     for (int i=0;i<nb_elt;i++){
-        const N2&         jdof = dof[i];
-        const array<2,R3> xdof = dof(i);
-        R2x2 M_local = MassP1(mesh[i]);
-        C2 Uinc;
+        const N3&         jdof = dof[i];
+        const array<3,R3> xdof = dof(i);
+        R3x3 M_local = MassP1(mesh[i]);
+        C3 Uinc;
         Uinc[0]= iu*kappa*dir[0]*normal[i][0]*exp( iu*kappa*(xdof[0],dir) );
         Uinc[1]= iu*kappa*dir[1]*normal[i][1]*exp( iu*kappa*(xdof[1],dir) );
+        Uinc[2]= iu*kappa*dir[1]*normal[i][2]*exp( iu*kappa*(xdof[2],dir) );
 
-        for(int k=0;k<2;k++){
-            rhs[jdof[k]] -= (M_local(k,0)*Uinc[0]+M_local(k,1)*Uinc[1]);
+        for(int k=0;k<3;k++){
+            rhs[jdof[k]] -= (M_local(k,0)*Uinc[0]+M_local(k,1)*Uinc[1]+M_local(k,2)*Uinc[2]);
         }
     }
 
