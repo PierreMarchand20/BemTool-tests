@@ -75,8 +75,8 @@ double Test_potential_2D_hmat(Real kappa, Real radius, Real lc, Real lc_output) 
   std::shared_ptr<htool::Cluster_tree> t=std::make_shared<htool::Cluster_tree>(x_output);
 	std::shared_ptr<htool::Cluster_tree> s=std::make_shared<htool::Cluster_tree>(x);
 
-  htool::HMatrix<htool::partialACA,Cplx> SL_hmat(generator_SL,t,x_output,s,x);
-  htool::HMatrix<htool::partialACA,Cplx> DL_hmat(generator_DL,t,x_output,s,x);
+  htool::HMatrix<Cplx,htool::partialACA,htool::GeometricClustering> SL_hmat(generator_SL,t,x_output,s,x);
+  htool::HMatrix<Cplx,htool::partialACA,htool::GeometricClustering> DL_hmat(generator_DL,t,x_output,s,x);
   SL_hmat.print_infos();
   DL_hmat.print_infos();
 

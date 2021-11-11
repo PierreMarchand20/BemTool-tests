@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
 
     // other datas
     R3 dir; dir[0]=1./std::sqrt(2);dir[1]=1./std::sqrt(2);dir[2]=0;
-    Cplx combined_coef=iu;
+    Cplx combined_coef=kappa*iu;
 
     //////////////////////////////////////////// HTOOL variable
     htool::SetNdofPerElt(1);
@@ -147,9 +147,9 @@ int main(int argc, char *argv[]) {
     // HMatrix
     if (rank==0)
 	   std::cout << "Building Hmatrix" << std::endl;
-    htool::HMatrix<htool::partialACA,Cplx> CBIO(generator_CBIO,t,x);
-    htool::HMatrix<htool::partialACA,Cplx> pot_SL(generator_pot_SL,t_output,x_output,t,x);
-    htool::HMatrix<htool::partialACA,Cplx> pot_DL(generator_pot_DL,t_output,x_output,t,x);
+    htool::HMatrix<Cplx,htool::partialACA,htool::GeometricClustering> CBIO(generator_CBIO,t,x);
+    htool::HMatrix<Cplx,htool::partialACA,htool::GeometricClustering> pot_SL(generator_pot_SL,t_output,x_output,t,x);
+    htool::HMatrix<Cplx,htool::partialACA,htool::GeometricClustering> pot_DL(generator_pot_DL,t_output,x_output,t,x);
 
     // Right-hand side
     if (rank==0)
@@ -194,7 +194,7 @@ int main(int argc, char *argv[]) {
     // Solve
     std::vector<Cplx> sol(nb_dof,0);
     std::vector<double> sol_abs(nb_dof),sol_real(nb_dof);
-    htool::DDM<htool::partialACA,Cplx> ddm(generator_CBIO,CBIO,ovr_subdomain_to_global,cluster_to_ovr_subdomain,neighbors,intersections);
+    htool::DDM<Cplx,htool::partialACA,htool::GeometricClustering> ddm(generator_CBIO,CBIO,ovr_subdomain_to_global,cluster_to_ovr_subdomain,neighbors,intersections);
     // opt.parse("-hpddm_schwarz_method n");
     ddm.facto_one_level();
     ddm.solve(rhs.data(),sol.data());

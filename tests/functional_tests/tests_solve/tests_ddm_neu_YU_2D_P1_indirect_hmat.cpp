@@ -87,8 +87,8 @@ int main(int argc, char *argv[]) {
     std::shared_ptr<htool::Cluster_tree> t=std::make_shared<htool::Cluster_tree>(x);
 
     // HMatrix
-    htool::HMatrix<htool::partialACA,Cplx> W(generator_W,t,x);
-    htool::HMatrix<htool::partialACA,Cplx> DL(generator_DL,t_output,x_output,t,x);
+    htool::HMatrix<Cplx,htool::partialACA,htool::GeometricClustering> W(generator_W,t,x);
+    htool::HMatrix<Cplx,htool::partialACA,htool::GeometricClustering> DL(generator_DL,t_output,x_output,t,x);
     // Right-hand side
     std::vector<Cplx> rhs(nb_dof,0);
     std::vector<double> rhs_real(nb_dof,0),rhs_abs(nb_dof,0);
@@ -127,7 +127,7 @@ int main(int argc, char *argv[]) {
     // Solve
     std::vector<Cplx> sol(nb_dof,0);
     std::vector<double> sol_abs(nb_dof),sol_real(nb_dof);
-    htool::DDM<htool::partialACA,Cplx> ddm(generator_W,W,ovr_subdomain_to_global,cluster_to_ovr_subdomain,neighbors,intersections);
+    htool::DDM<Cplx,htool::partialACA,htool::GeometricClustering> ddm(generator_W,W,ovr_subdomain_to_global,cluster_to_ovr_subdomain,neighbors,intersections);
     ddm.solve(rhs.data(),sol.data());
 
 

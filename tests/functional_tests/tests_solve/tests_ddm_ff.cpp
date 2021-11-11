@@ -134,8 +134,8 @@ int main(int argc, char *argv[]) {
     FFMatrix<Cplx> ffmatrix("A.dat");
 
     // HMatrix
-    htool::HMatrix<htool::partialACA,Cplx> W(ffmatrix,t,x);
-    // htool::HMatrix<htool::partialACA,Cplx> DL(generator_DL,t_output,x_output,t,x);
+    htool::HMatrix<Cplx,htool::partialACA,htool::GeometricClustering> W(ffmatrix,t,x);
+    // htool::HMatrix<Cplx,htool::partialACA,htool::GeometricClustering> DL(generator_DL,t_output,x_output,t,x);
 
     // Right-hand side
     std::vector<Cplx> rhs(nb_dof,1);
@@ -296,7 +296,7 @@ int main(int argc, char *argv[]) {
     // Solve
     std::vector<Cplx> sol(nb_dof,0);
     std::vector<double> sol_abs(nb_dof),sol_real(nb_dof);
-    // htool::DDM<htool::partialACA,Cplx> ddm(generator_V,V,ovr_subdomain_to_global,cluster_to_ovr_subdomain,neighbors,intersections);
+    // htool::DDM<Cplx,htool::partialACA,htool::GeometricClustering> ddm(generator_V,V,ovr_subdomain_to_global,cluster_to_ovr_subdomain,neighbors,intersections);
     // ddm.solve(rhs.data(),sol.data());
 
     htool::Proto_DDM<htool::partialACA,Cplx> ddm(ffmatrix,W,ovr_subdomain_to_global,cluster_to_ovr_subdomain,neighbors,intersections,Ci);

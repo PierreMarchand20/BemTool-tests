@@ -89,10 +89,10 @@ int Test_solve(Real kappa, Real radius, Real lc, int save) {
   std::shared_ptr<htool::Cluster_tree> t=std::make_shared<htool::Cluster_tree>(x);
 
   // HMatrix
-  htool::HMatrix<htool::partialACA,Cplx> V(generator_V,t,x);
-	htool::HMatrix<htool::partialACA,Cplx> K(generator_K,t,x);
-	htool::HMatrix<htool::partialACA,Cplx> SL(generator_SL,t_output,x_output,t,x);
-	htool::HMatrix<htool::partialACA,Cplx> DL(generator_DL,t_output,x_output,t,x);
+  htool::HMatrix<Cplx,htool::partialACA,htool::GeometricClustering> V(generator_V,t,x);
+	htool::HMatrix<Cplx,htool::partialACA,htool::GeometricClustering> K(generator_K,t,x);
+	htool::HMatrix<Cplx,htool::partialACA,htool::GeometricClustering> SL(generator_SL,t_output,x_output,t,x);
+	htool::HMatrix<Cplx,htool::partialACA,htool::GeometricClustering> DL(generator_DL,t_output,x_output,t,x);
 
   // Right-hand side
   std::vector<Cplx> temp(nb_dof,0),gd(nb_dof,0),rhs(nb_dof,0);

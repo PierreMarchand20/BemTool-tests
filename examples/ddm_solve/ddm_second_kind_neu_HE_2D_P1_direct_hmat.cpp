@@ -80,14 +80,16 @@ int main(int argc, char *argv[]) {
     Orienting(mesh);
     mesh = unbounded;
     int nb_elt = NbElt(mesh);
-    std::vector<R3> normal = NormalTo(mesh);
 
     // Mesh
+    if (rank==0)
+        std::cout << "Loading output mesh" << std::endl;
     Geometry node_output(meshname_output);
     int nb_dof_output = NbNode(node_output);
     Mesh2D mesh_output; mesh_output.Load(node_output);
     std::vector<htool::R3> x_output(nb_dof_output);
     std::vector<Cplx> uinc(nb_dof_output);
+    std::vector<int> tab_output(nb_dof_output);
     std::vector<double> uinc_real(nb_dof_output),uinc_abs(nb_dof_output);
     for (int i=0;i<nb_dof_output;i++){
         x_output[i][0]=node_output[i][0];
@@ -97,6 +99,7 @@ int main(int argc, char *argv[]) {
         uinc[i] = exp(iu*kappa*temp);
         uinc_real[i] = std::real(uinc[i]);
         uinc_abs[i] = std::abs(uinc[i]);
+        tab_output[i]=i;
     }
     if (rank==0 && save>0){
         WritePointValGmsh(mesh_output,(outputpath+"uinc_real.msh").c_str(),uinc_real);
@@ -109,20 +112,22 @@ int main(int argc, char *argv[]) {
     Dof<P1_1D> dof(mesh);
     int nb_dof = NbDof(dof);
     std::vector<htool::R3> x(nb_dof);
+    std::vector<int>    tab(nb_dof);
     for (int i=0;i<nb_dof;i++){
       x[i][0]=dof(((dof.ToElt(i))[0])[0])[((dof.ToElt(i))[0])[1]][0];
       x[i][1]=dof(((dof.ToElt(i))[0])[0])[((dof.ToElt(i))[0])[1]][1];
       x[i][2]=dof(((dof.ToElt(i))[0])[0])[((dof.ToElt(i))[0])[1]][2];
+      tab[i]=i;
     }
 
   	// Operator
-  	Potential<PotKernel<HE,DL_POT,2,P1_1D>> POT_DL(mesh,kappa);
+  	Potential<PotKernel<HE,DL_POT,2,P1_1D>> POT_SL(mesh,kappa);
 
     // Generator
     if (rank==0)
        std::cout << "Creating generators"<<std::endl;
-    BIO_Generator<HE_HS_2D_P1xP1,P1_1D> generator_W(dof,kappa);
-    POT_Generator<PotKernel<HE,DL_POT,2,P1_1D>,P1_1D> generator_DL(POT_DL,dof,node_output);
+    BIO_Generator_w_mass<HE_DL_2D_P1xP1,P1_1D> generator_DL(dof,kappa,-0.5);
+    POT_Generator<PotKernel<HE,DL_POT,2,P1_1D>,P1_1D> generator_pot_SL(POT_SL,dof,node_output);
 
     // Weights
     if (rank==0)
@@ -136,11 +141,17 @@ int main(int argc, char *argv[]) {
         }
     }
 
+  	// Cluster trees
+  	std::shared_ptr<htool::GeometricClustering> t_output=std::make_shared<htool::GeometricClustering>();
+    t_output->build(x_output,std::vector<double>(x_output.size(),0),tab_output,std::vector<double>(x_output.size(),1));
+    std::shared_ptr<htool::GeometricClustering> t=std::make_shared<htool::GeometricClustering>();
+    t->build(x,std::vector<double>(x.size(),0),tab,g);
+
     // HMatrix
     if (rank==0)
 	   std::cout << "Building Hmatrix" << std::endl;
-    htool::HMatrix<Cplx,htool::partialACA,htool::GeometricClustering> W(generator_W,x);
-    htool::HMatrix<Cplx,htool::partialACA,htool::GeometricClustering> DL(generator_DL,x_output,x);
+    htool::HMatrix<Cplx,htool::partialACA,htool::GeometricClustering> DL(generator_DL,t,x);
+    htool::HMatrix<Cplx,htool::partialACA,htool::GeometricClustering> pot_SL(generator_pot_SL,t_output,x_output,t,x);
 
     // Right-hand side
     if (rank==0)
@@ -152,8 +163,8 @@ int main(int argc, char *argv[]) {
         const array<2,R3> xdof = dof(i);
         R2x2 M_local = MassP1(mesh[i]);
         C2 Uinc;
-        Uinc[0]= iu*kappa*(dir,normal[i])*exp( iu*kappa*(xdof[0],dir) );
-        Uinc[1]= iu*kappa*(dir,normal[i])*exp( iu*kappa*(xdof[1],dir) );
+        Uinc[0]= exp( iu*kappa*(xdof[0],dir) );
+        Uinc[1]= exp( iu*kappa*(xdof[1],dir) );
 
         for(int k=0;k<2;k++){
             rhs[jdof[k]] -= (M_local(k,0)*Uinc[0]+M_local(k,1)*Uinc[1]);
@@ -168,7 +179,7 @@ int main(int argc, char *argv[]) {
     std::vector<int> neighbors;
     std::vector<std::vector<int> > intersections;
 
-    Partition(W.get_MasterOffset_t(), W.get_permt(),dof,cluster_to_ovr_subdomain,ovr_subdomain_to_global,neighbors,intersections);
+    Partition(DL.get_MasterOffset_t(), DL.get_permt(),dof,cluster_to_ovr_subdomain,ovr_subdomain_to_global,neighbors,intersections);
 
     // Visu overlap
     if (save>0){
@@ -185,16 +196,15 @@ int main(int argc, char *argv[]) {
     // Solve
     std::vector<Cplx> sol(nb_dof,0);
     std::vector<double> sol_abs(nb_dof),sol_real(nb_dof);
-    htool::DDM<Cplx,htool::partialACA,htool::GeometricClustering> ddm(generator_W,W,ovr_subdomain_to_global,cluster_to_ovr_subdomain,neighbors,intersections);
-    opt.parse("-hpddm_schwarz_method asm");
+    htool::DDM<Cplx,htool::partialACA,htool::GeometricClustering> ddm(generator_DL,DL,ovr_subdomain_to_global,cluster_to_ovr_subdomain,neighbors,intersections);
+    // opt.parse("-hpddm_schwarz_method n");
     ddm.facto_one_level();
     ddm.solve(rhs.data(),sol.data());
-
 
     // Radiated field
     if (rank==0)
         std::cout << "Radiated field" << std::endl;
-    std::vector<Cplx> sol_DL=DL*sol;
+    std::vector<Cplx> sol_DL=pot_SL*sol;
     std::vector<double> rad_real(nb_dof_output,0),rad_phase(nb_dof_output,0),rad_abs(nb_dof_output,0);
 
     for (int i =0;i<nb_dof_output;i++){
@@ -204,11 +214,11 @@ int main(int argc, char *argv[]) {
     }
 
     // Save
-    W.print_infos();
     DL.print_infos();
+    pot_SL.print_infos();
     ddm.print_infos();
-    W.save_infos((outputpath+"infos_W.txt").c_str());
-    DL.save_infos((outputpath+"infos_DL.txt").c_str());
+    DL.save_infos((outputpath+"infos_V.txt").c_str());
+    pot_SL.save_infos((outputpath+"infos_SL.txt").c_str());
     ddm.save_infos((outputpath+"solve.txt").c_str());
 
     if (rank==0 && save>0){

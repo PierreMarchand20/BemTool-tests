@@ -144,8 +144,8 @@ int main(int argc, char *argv[]) {
     // HMatrix
     if (rank==0)
 	   std::cout << "Building Hmatrix" << std::endl;
-    htool::HMatrix<htool::partialACA,Cplx> W(generator_W,t,x);
-    htool::HMatrix<htool::partialACA,Cplx> DL(generator_DL,t_output,x_output,t,x);
+    htool::HMatrix<Cplx,htool::partialACA,htool::GeometricClustering> W(generator_W,t,x);
+    htool::HMatrix<Cplx,htool::partialACA,htool::GeometricClustering> DL(generator_DL,t_output,x_output,t,x);
 
     // Right-hand side
     if (rank==0)
@@ -157,9 +157,9 @@ int main(int argc, char *argv[]) {
         const array<3,R3> xdof = dof(i);
         R3x3 M_local = MassP1(mesh[i]);
         C3 Uinc;
-        Uinc[0]= iu*kappa*dir[0]*normal[i][0]*exp( iu*kappa*(xdof[0],dir) );
-        Uinc[1]= iu*kappa*dir[1]*normal[i][1]*exp( iu*kappa*(xdof[1],dir) );
-        Uinc[2]= iu*kappa*dir[1]*normal[i][2]*exp( iu*kappa*(xdof[2],dir) );
+        Uinc[0]= iu*kappa*(dir,normal[i])*exp( iu*kappa*(xdof[0],dir) );
+        Uinc[1]= iu*kappa*(dir,normal[i])*exp( iu*kappa*(xdof[1],dir) );
+        Uinc[2]= iu*kappa*(dir,normal[i])*exp( iu*kappa*(xdof[2],dir) );
 
         for(int k=0;k<3;k++){
             rhs[jdof[k]] -= (M_local(k,0)*Uinc[0]+M_local(k,1)*Uinc[1]+M_local(k,2)*Uinc[2]);
@@ -191,7 +191,7 @@ int main(int argc, char *argv[]) {
     // Solve
     std::vector<Cplx> sol(nb_dof,0);
     std::vector<double> sol_abs(nb_dof),sol_real(nb_dof);
-    htool::DDM<htool::partialACA,Cplx> ddm(generator_W,W,ovr_subdomain_to_global,cluster_to_ovr_subdomain,neighbors,intersections);
+    htool::DDM<Cplx,htool::partialACA,htool::GeometricClustering> ddm(generator_W,W,ovr_subdomain_to_global,cluster_to_ovr_subdomain,neighbors,intersections);
     opt.parse("-hpddm_schwarz_method asm");
     ddm.facto_one_level();
     ddm.solve(rhs.data(),sol.data());

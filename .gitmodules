@@ -1,3 +1,9 @@
 [submodule "external/nanogui"]
 	path = external/nanogui
 	url = https://github.com/wjakob/nanogui.git
+[submodule "external/htool"]
+	path = external/htool
+	url = https://github.com/htool-ddm/htool.git
+[submodule "external/bemtool"]
+	path = external/bemtool
+	url = https://github.com/PierreMarchand20/BemTool.git

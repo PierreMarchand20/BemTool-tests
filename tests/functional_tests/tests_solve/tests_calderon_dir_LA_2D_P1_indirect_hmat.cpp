@@ -86,9 +86,9 @@ int main(int argc, char *argv[]) {
     std::shared_ptr<htool::Cluster_tree> t=std::make_shared<htool::Cluster_tree>(x);
 
     // HMatrix
-    htool::HMatrix<htool::partialACA,Cplx> V(generator_V,t,x);
-    htool::HMatrix<htool::partialACA,Cplx> W(generator_W,t,x);
-    htool::HMatrix<htool::partialACA,Cplx> SL(generator_SL,t_output,x_output,t,x);
+    htool::HMatrix<Cplx,htool::partialACA,htool::GeometricClustering> V(generator_V,t,x);
+    htool::HMatrix<Cplx,htool::partialACA,htool::GeometricClustering> W(generator_W,t,x);
+    htool::HMatrix<Cplx,htool::partialACA,htool::GeometricClustering> SL(generator_SL,t_output,x_output,t,x);
 
     // Mass matrix
     htool::Matrix<Cplx> M(nb_dof,nb_dof);

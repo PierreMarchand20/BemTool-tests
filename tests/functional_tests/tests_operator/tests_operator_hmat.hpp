@@ -49,27 +49,36 @@ Real Test_operator_hmat(Real kappa, Real radius, Real lc) {
     // Dof
     Dof<Discretization> dof(mesh);
     int nb_dof = NbDof(dof);
-    std::vector<htool::R3> x(nb_dof);
+    std::vector<double> x(3*nb_dof);
     for (int i=0;i<nb_dof;i++){
-        x[i][0]=dof(((dof.ToElt(i))[0])[0])[((dof.ToElt(i))[0])[1]][0];
-        x[i][1]=dof(((dof.ToElt(i))[0])[0])[((dof.ToElt(i))[0])[1]][1];
-        x[i][2]=dof(((dof.ToElt(i))[0])[0])[((dof.ToElt(i))[0])[1]][2];
+        x[3*i+0]=dof(((dof.ToElt(i))[0])[0])[((dof.ToElt(i))[0])[1]][0];
+        x[3*i+1]=dof(((dof.ToElt(i))[0])[0])[((dof.ToElt(i))[0])[1]][1];
+        x[3*i+2]=dof(((dof.ToElt(i))[0])[0])[((dof.ToElt(i))[0])[1]][2];
     }
 
     // Generator
     BIO_Generator<OperatorType,Discretization> generator(dof,kappa);
 
+    // Clustering
+    if (rank == 0)
+        std::cout << "Creating cluster tree" << std::endl;
+    std::shared_ptr<htool::Cluster<htool::PCAGeometricClustering>> t = std::make_shared<htool::Cluster<htool::PCAGeometricClustering>>();
+    std::vector<int> tab(nb_dof);
+    t->build(nb_dof, x.data(),2);
+
     // HMatrix
-    htool::HMatrix<htool::partialACA,Cplx> A(generator,x);
+    htool::HMatrix<Cplx> A(t,t);
+    A.set_eta(-1);
+    A.build(generator,x.data());
     A.print_infos();
 
     // Eigenvector
     std::vector<Cplx> En(nb_dof);
     std::vector<double> En_real(nb_dof);
     for(int j=0; j<nb_elt; j++){
-        const array<dim+1,int>&  jdof = dof[j];
-        const array<dim+1,R3> xdof = dof(j);
-        for(int k=0; k<dim+1; k++){
+        const array<Dof<Discretization>::Trait::nb_dof_loc,int>&  jdof = dof[j];
+        const array<Dof<Discretization>::Trait::nb_dof_loc,R3> xdof = dof(j);
+        for(int k=0; k<Dof<Discretization>::Trait::nb_dof_loc; k++){
             if (dim==1){
                 En[jdof[k]] = exp(iu*n*std::atan2 (xdof[k][1],xdof[k][0]));
             }

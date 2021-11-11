@@ -144,8 +144,8 @@ int main(int argc, char *argv[]) {
     // HMatrix
     if (rank==0)
 	   std::cout << "Building Hmatrix" << std::endl;
-    htool::HMatrix<htool::partialACA,Cplx> V(generator_V,t,x);
-    htool::HMatrix<htool::partialACA,Cplx> SL(generator_SL,t_output,x_output,t,x);
+    htool::HMatrix<Cplx,htool::partialACA,htool::GeometricClustering> V(generator_V,t,x);
+    htool::HMatrix<Cplx,htool::partialACA,htool::GeometricClustering> SL(generator_SL,t_output,x_output,t,x);
 
     // Right-hand side
     if (rank==0)
@@ -190,7 +190,7 @@ int main(int argc, char *argv[]) {
     // Solve
     std::vector<Cplx> sol(nb_dof,0);
     std::vector<double> sol_abs(nb_dof),sol_real(nb_dof);
-    htool::DDM<htool::partialACA,Cplx> ddm(generator_V,V,ovr_subdomain_to_global,cluster_to_ovr_subdomain,neighbors,intersections);
+    htool::DDM<Cplx,htool::partialACA,htool::GeometricClustering> ddm(generator_V,V,ovr_subdomain_to_global,cluster_to_ovr_subdomain,neighbors,intersections);
     opt.parse("-hpddm_schwarz_method asm");
     ddm.facto_one_level();
     ddm.solve(rhs.data(),sol.data());

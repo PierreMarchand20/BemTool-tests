@@ -15,7 +15,9 @@ int main(int argc, char *argv[]) {
 
   // Test
   int test = 0;
-  Real error = 100*Test_operator_hmat<1,LA_SL_2D_P1xP1,P1_1D>(kappa,radius,lc);
+  // htool::tic();
+  Real error = 100*Test_operator_hmat<1,LA_SL_2D_P0xP0,P0_1D>(kappa,radius,lc);
+  // htool::toc();
 	test = test || error>1;
   if (rank==0){
 		std::cout << "Relative error:\t"<<error<<" %"<<std::endl;

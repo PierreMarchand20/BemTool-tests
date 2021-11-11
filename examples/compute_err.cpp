@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
     t->print_infos();
 
     // HMatrix
-    htool::HMatrix<htool::partialACA,Cplx> A(generator,t,x);
+    htool::HMatrix<Cplx,htool::partialACA,htool::GeometricClustering> A(generator,t,x);
     A.print_infos();
 
     // Compute error

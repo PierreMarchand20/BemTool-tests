@@ -11,11 +11,13 @@ int main(int argc, char *argv[]) {
   // Data
   Real kappa = 0.5;
   Real radius = 0.5;
-  Real lc = 0.002;
+  Real lc = 0.001;
 
   // Test
   int test = 0;
-  Real error = 100*Test_operator_hmat<1,LA_SL_2D_P1xP1,P1_1D>(kappa,radius,lc);
+  // htool::tic();
+  Real error = 100*Test_operator_hmat<1,HE_DL_2D_P2xP2,P2_1D>(kappa,radius,lc);
+  // htool::toc();
 	test = test || error>1;
   if (rank==0){
 		std::cout << "Relative error:\t"<<error<<" %"<<std::endl;

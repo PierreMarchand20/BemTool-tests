@@ -8,12 +8,6 @@ int main(int argc, char *argv[]) {
 	int rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-  // HTOOL variable
-  htool::SetNdofPerElt(1);
-  htool::SetEpsilon(1e-6);
-  htool::SetEta(1);
-  htool::SetMinClusterSize(10);
-
   // Data
   Real kappa = 0.5;
   Real radius = 0.5;
@@ -21,9 +15,9 @@ int main(int argc, char *argv[]) {
 
   // Test
   int test = 0;
-  htool::tic();
+  // htool::tic();
   Real error = 100*Test_operator_hmat<1,HE_SL_2D_P1xP1,P1_1D>(kappa,radius,lc);
-  htool::toc();
+  // htool::toc();
 	test = test || error>1;
 	if (rank==0){
   	std::cout << "Relative error:\t"<<error<<" %"<<std::endl;
